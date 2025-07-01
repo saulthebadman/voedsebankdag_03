@@ -1,0 +1,125 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Gezinnen met allergie: ') . $allergie->naam }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    
+                    <!-- Navigatie terug -->
+                    <div class="mb-6">
+                        <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            ← Terug naar overzicht
+                        </a>
+                    </div>
+
+                    <!-- Filter sectie -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-lg font-medium mb-4">Filter op allergie</h3>
+                        <form method="GET" action="{{ route('allergieen.filter') }}" class="flex items-end space-x-4">
+                            <div class="flex-1">
+                                <label for="allergie_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Selecteer allergie:
+                                </label>
+                                <select name="allergie_id" id="allergie_id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="">-- Kies een allergie --</option>
+                                    @foreach($allergieen as $allergieOption)
+                                        <option value="{{ $allergieOption->id }}" {{ $allergieOption->id == $allergie->id ? 'selected' : '' }}>
+                                            {{ $allergieOption->naam }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    Toon Gezinnen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Allergie informatie -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="text-lg font-medium text-blue-900 mb-2">{{ $allergie->naam }}</h3>
+                        <p class="text-blue-800 mb-2">{{ $allergie->omschrijving }}</p>
+                        <p class="text-sm text-blue-700">
+                            <strong>Anafylactisch risico:</strong> 
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                @if($allergie->anafylactisch_risico === 'hoog') bg-red-100 text-red-800
+                                @elseif($allergie->anafylactisch_risico === 'redelijk_hoog') bg-orange-100 text-orange-800
+                                @elseif($allergie->anafylactisch_risico === 'laag') bg-yellow-100 text-yellow-800
+                                @else bg-green-100 text-green-800
+                                @endif">
+                                {{ ucfirst(str_replace('_', ' ', $allergie->anafylactisch_risico)) }}
+                            </span>
+                        </p>
+                    </div>
+
+                    <!-- Resultaten -->
+                    <div>
+                        @if($bericht)
+                            <!-- Scenario 2: Geen gezinnen gevonden -->
+                            <div class="text-center py-12">
+                                <div class="max-w-md mx-auto">
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                                        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-yellow-100 rounded-full">
+                                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-medium text-yellow-800 mb-2">Geen resultaten</h3>
+                                        <p class="text-yellow-700">{{ $bericht }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Scenario 1: Gezinnen gevonden -->
+                            <h3 class="text-lg font-medium mb-4">
+                                Gezinnen met allergie "{{ $allergie->naam }}" ({{ $gezinnenMetAllergie->count() }} {{ $gezinnenMetAllergie->count() === 1 ? 'gezin' : 'gezinnen' }})
+                            </h3>
+                            
+                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                @foreach($gezinnenMetAllergie as $gezin)
+                                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                                        <div class="mb-3">
+                                            <h4 class="font-semibold text-lg text-gray-900">{{ $gezin->naam }}</h4>
+                                            <p class="text-sm text-gray-600">Code: {{ $gezin->code }}</p>
+                                            <p class="text-sm text-gray-600">{{ $gezin->omschrijving }}</p>
+                                            <p class="text-sm text-gray-600">Totaal personen: {{ $gezin->totaal_aantal_personen }}</p>
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <h5 class="font-medium text-sm text-gray-700">Personen met {{ $allergie->naam }} allergie:</h5>
+                                            @foreach($gezin->personen as $persoon)
+                                                <div class="text-sm bg-red-50 p-2 rounded border border-red-200">
+                                                    <strong>{{ $persoon->volledige_naam }}</strong>
+                                                    <div class="mt-1">
+                                                        @foreach($persoon->allergieen as $persoonAllergie)
+                                                            <span class="inline-block px-2 py-1 text-xs font-semibold text-white 
+                                                                @if($persoonAllergie->id === $allergie->id) bg-red-600 
+                                                                @else bg-gray-400 
+                                                                @endif rounded-full mr-1 mb-1">
+                                                                {{ $persoonAllergie->naam }}
+                                                                @if($persoonAllergie->anafylactisch_risico === 'hoog')
+                                                                    ⚠️
+                                                                @endif
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
