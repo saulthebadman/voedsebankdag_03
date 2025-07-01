@@ -19,5 +19,19 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        $leverancier = \App\Models\Leverancier::factory()->create([
+            'naam' => 'kagan',
+            'leverancier_type' => 'Particulier',
+            'leveranciernummer' => 4,
+        ]);
+
+        \App\Models\Product::factory()->create([
+            'leverancier_id' => $leverancier->id,
+            'naam' => 'Test Product',
+            'soort_allergie' => 'Gluten',
+            'barcode' => '1234567890123',
+            'houdbaarheidsdatum' => now()->addMonth()->toDateString(),
+        ]);
     }
 }
