@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/leveranciers/{leverancier}/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/leveranciers/{leverancier}/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::put('/leveranciers/{leverancier}/products/{product}/inline', [ProductController::class, 'inlineUpdate'])->name('products.inlineUpdate');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
