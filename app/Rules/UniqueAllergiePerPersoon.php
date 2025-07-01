@@ -24,7 +24,7 @@ class UniqueAllergiePerPersoon implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $query = DB::table('allergie_per_persoon')
+        $query = DB::table('allergie_per_persoons')
             ->where('persoon_id', $this->persoonId)
             ->where('allergie_id', $value);
 

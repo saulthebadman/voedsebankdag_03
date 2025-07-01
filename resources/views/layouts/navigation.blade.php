@@ -21,13 +21,7 @@
                     
                     <!-- Dropdown for future modules -->
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">
-                            📋 Modules
-                            <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        
+                 
                         <div x-show="open" x-transition @click.away="open = false" class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                             <div class="py-1">
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 opacity-50 cursor-not-allowed">
@@ -125,7 +119,6 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="#" class="opacity-50">
                 📈 {{ __('Rapportage (Binnenkort)') }}
-            </x-responsive-nav-link>
             </x-responsive-nav-link>
         </div>
 

@@ -15,47 +15,41 @@ class AllergieController extends Controller
 {
     /**
      * Toon overzicht van alle gezinnen met allergieën
-     * Gebruikt stored procedure voor geoptimaliseerde prestaties
      */
     public function index()
     {
         try {
-            // Probeer eerst stored procedure te gebruiken
-            try {
-                $gezinnenData = DB::select('CALL GetGezinnenMetAllergien()');
-                
-                // Converteer naar Collection voor consistentie met Eloquent
-                $gezinnenMetAllergieen = collect($gezinnenData)->map(function($gezin) {
+            // Gebruik Eloquent om gezinnen met allergieën op te halen
+            $gezinnenMetAllergieen = Gezin::whereHas('personen.allergieen')
+                ->with(['personen.allergieen'])
+                ->orderBy('naam')
+                ->get()
+                ->map(function($gezin) {
+                    // Bereken statistieken
+                    $personenMetAllergieen = $gezin->personen->filter(function($persoon) {
+                        return $persoon->allergieen->isNotEmpty();
+                    });
+                    
                     return (object) [
                         'id' => $gezin->id,
                         'naam' => $gezin->naam,
-                        'adres' => $gezin->adres,
-                        'postcode' => $gezin->postcode,
-                        'woonplaats' => $gezin->woonplaats,
-                        'telefoon' => $gezin->telefoon,
-                        'email' => $gezin->email,
-                        'aantal_personen' => $gezin->aantal_personen,
-                        'aantal_allergie_registraties' => $gezin->aantal_allergie_registraties
+                        'code' => $gezin->code ?? 'GZ' . str_pad($gezin->id, 3, '0', STR_PAD_LEFT),
+                        'adres' => $gezin->adres ?? '',
+                        'postcode' => $gezin->postcode ?? '',
+                        'woonplaats' => $gezin->woonplaats ?? '',
+                        'telefoon' => $gezin->telefoon ?? '',
+                        'email' => $gezin->email ?? '',
+                        'aantal_personen' => $gezin->aantal_personen ?? $gezin->personen->count(),
+                        'aantal_allergie_registraties' => $gezin->personen->sum(function($persoon) {
+                            return $persoon->allergieen->count();
+                        }),
+                        'omschrijving' => $gezin->omschrijving ?? "Gezin met " . $gezin->personen->count() . " personen",
+                        'aantal_volwassenen' => $gezin->aantal_volwassenen ?? 0,
+                        'aantal_kinderen' => $gezin->aantal_kinderen ?? 0,
+                        'aantal_babys' => $gezin->aantal_babys ?? 0,
+                        'personen' => $gezin->personen
                     ];
                 });
-                
-                Log::info('Using stored procedure for gezinnen data', [
-                    'procedure' => 'GetGezinnenMetAllergien',
-                    'user_id' => auth()->id()
-                ]);
-                
-            } catch (Exception $spException) {
-                // Fallback to Eloquent if stored procedure fails
-                Log::warning('Stored procedure failed, using Eloquent fallback', [
-                    'error' => $spException->getMessage(),
-                    'user_id' => auth()->id()
-                ]);
-                
-                $gezinnenMetAllergieen = Gezin::whereHas('personen.allergieen')
-                    ->with(['personen.allergieen'])
-                    ->orderBy('naam')
-                    ->get();
-            }
 
             // Haal alle allergieën op voor de dropdown
             $allergieen = Allergie::orderBy('naam')->get();
@@ -92,7 +86,7 @@ class AllergieController extends Controller
         try {
             // Valideer input
             $request->validate([
-                'allergie_id' => 'required|integer|exists:allergies,id,is_actief,1'
+                'allergie_id' => 'required|integer|exists:allergie,id,is_actief,1'
             ], [
                 'allergie_id.required' => 'Selecteer een allergie om te filteren.',
                 'allergie_id.integer' => 'Ongeldige allergie geselecteerd.',
@@ -111,11 +105,21 @@ class AllergieController extends Controller
                     return (object) [
                         'id' => $gezin->id,
                         'naam' => $gezin->naam,
+                        'code' => $gezin->code ?? 'GZ' . str_pad($gezin->id, 3, '0', STR_PAD_LEFT),
                         'adres' => $gezin->adres,
                         'postcode' => $gezin->postcode,
                         'woonplaats' => $gezin->woonplaats,
+                        'telefoon' => $gezin->telefoon ?? '',
+                        'email' => $gezin->email ?? '',
                         'allergie_naam' => $gezin->allergie_naam,
-                        'aantal_personen_met_allergie' => $gezin->aantal_personen_met_allergie
+                        'aantal_personen_met_allergie' => $gezin->aantal_personen_met_allergie,
+                        // Extra properties die de view verwacht
+                        'omschrijving' => "Gezin met {$gezin->aantal_personen_met_allergie} personen met deze allergie",
+                        'aantal_volwassenen' => $gezin->aantal_personen_met_allergie ?? 0,
+                        'aantal_kinderen' => 0,
+                        'aantal_babys' => 0,
+                        // Simuleer personen collectie - voor nu leeg, later uit database halen
+                        'personen' => collect([])
                     ];
                 });
                 
@@ -142,7 +146,31 @@ class AllergieController extends Controller
                     })->with('allergieen');
                 }])
                 ->orderBy('naam')
-                ->get();
+                ->get()
+                ->map(function($gezin) use ($allergie) {
+                    // Filter personen die deze specifieke allergie hebben
+                    $personenMetAllergie = $gezin->personen->filter(function($persoon) use ($allergie) {
+                        return $persoon->allergieen->contains('id', $allergie->id);
+                    });
+                    
+                    return (object) [
+                        'id' => $gezin->id,
+                        'naam' => $gezin->naam,
+                        'code' => $gezin->code ?? 'GZ' . str_pad($gezin->id, 3, '0', STR_PAD_LEFT),
+                        'adres' => $gezin->adres,
+                        'postcode' => $gezin->postcode,
+                        'woonplaats' => $gezin->woonplaats,
+                        'telefoon' => $gezin->telefoon ?? '',
+                        'email' => $gezin->email ?? '',
+                        'allergie_naam' => $allergie->naam,
+                        'aantal_personen_met_allergie' => $personenMetAllergie->count(),
+                        'omschrijving' => "Gezin met {$personenMetAllergie->count()} personen met {$allergie->naam}",
+                        'aantal_volwassenen' => $personenMetAllergie->count(),
+                        'aantal_kinderen' => 0,
+                        'aantal_babys' => 0,
+                        'personen' => $personenMetAllergie
+                    ];
+                });
             }
 
             // Haal alle allergieën op voor de dropdown
@@ -198,20 +226,27 @@ class AllergieController extends Controller
                     $eerstePersoon = $persoonAllergieen->first();
                     return (object) [
                         'id' => $persoonId,
-                        'volledige_naam' => $eerstePersoon->volledige_naam,
-                        'geboortedatum' => \Carbon\Carbon::parse($eerstePersoon->geboortedatum),
-                        'geslacht' => $eerstePersoon->geslacht,
+                        'volledige_naam' => $eerstePersoon->volledige_naam ?? 'Onbekende naam',
+                        'voornaam' => $eerstePersoon->voornaam ?? '',
+                        'tussenvoegsel' => $eerstePersoon->tussenvoegsel ?? '',
+                        'achternaam' => $eerstePersoon->achternaam ?? '',
+                        'geboortedatum' => isset($eerstePersoon->geboortedatum) ? \Carbon\Carbon::parse($eerstePersoon->geboortedatum) : null,
+                        'geslacht' => $eerstePersoon->geslacht ?? 'onbekend',
+                        'type_persoon' => $eerstePersoon->type_persoon ?? 'Klant',
+                        'is_vertegenwoordiger' => $eerstePersoon->is_vertegenwoordiger ?? false,
                         'allergieen' => $persoonAllergieen->map(function($allergie) {
                             return (object) [
                                 'id' => $allergie->allergie_id,
-                                'naam' => $allergie->allergie_naam,
-                                'beschrijving' => $allergie->allergie_beschrijving,
-                                'ernst_niveau' => $allergie->ernst_niveau,
+                                'naam' => $allergie->allergie_naam ?? 'Onbekende allergie',
+                                'beschrijving' => $allergie->allergie_beschrijving ?? '',
+                                'omschrijving' => $allergie->allergie_omschrijving ?? '',
+                                'ernst_niveau' => $allergie->ernst_niveau ?? 'middel',
+                                'anafylactisch_risico' => $allergie->anafylactisch_risico ?? 'laag',
                                 'pivot' => (object) [
-                                    'ernst' => $allergie->persoonlijke_ernst,
-                                    'opmerking' => $allergie->opmerking,
-                                    'datum_vastgesteld' => $allergie->datum_vastgesteld,
-                                    'created_at' => $allergie->created_at
+                                    'ernst' => $allergie->persoonlijke_ernst ?? 'middel',
+                                    'opmerking' => $allergie->opmerking ?? '',
+                                    'datum_vastgesteld' => $allergie->datum_vastgesteld ?? null,
+                                    'created_at' => $allergie->created_at ?? null
                                 ]
                             ];
                         })
@@ -234,9 +269,39 @@ class AllergieController extends Controller
                 
                 $gezin = Gezin::with(['personen.allergieen'])->findOrFail($gezinId);
                 
-                // Alleen personen met allergieën tonen
+                // Map Eloquent data to match stored procedure structure
                 $personenMetAllergieen = $gezin->personen->filter(function($persoon) {
                     return $persoon->allergieen->isNotEmpty();
+                })->mapWithKeys(function($persoon) {
+                    return [
+                        $persoon->id => (object) [
+                            'id' => $persoon->id,
+                            'volledige_naam' => $persoon->volledige_naam ?? trim($persoon->voornaam . ' ' . $persoon->tussenvoegsel . ' ' . $persoon->achternaam),
+                            'voornaam' => $persoon->voornaam ?? '',
+                            'tussenvoegsel' => $persoon->tussenvoegsel ?? '',
+                            'achternaam' => $persoon->achternaam ?? '',
+                            'geboortedatum' => $persoon->geboortedatum ? \Carbon\Carbon::parse($persoon->geboortedatum) : null,
+                            'geslacht' => $persoon->geslacht ?? 'onbekend',
+                            'type_persoon' => $persoon->type_persoon ?? 'Klant',
+                            'is_vertegenwoordiger' => $persoon->is_vertegenwoordiger ?? false,
+                            'allergieen' => $persoon->allergieen->map(function($allergie) {
+                                return (object) [
+                                    'id' => $allergie->id,
+                                    'naam' => $allergie->naam ?? 'Onbekende allergie',
+                                    'beschrijving' => $allergie->beschrijving ?? '',
+                                    'omschrijving' => $allergie->omschrijving ?? '',
+                                    'ernst_niveau' => $allergie->ernst_niveau ?? 'middel',
+                                    'anafylactisch_risico' => $allergie->anafylactisch_risico ?? 'laag',
+                                    'pivot' => (object) [
+                                        'ernst' => $allergie->pivot->ernst ?? 'middel',
+                                        'opmerking' => $allergie->pivot->opmerking ?? '',
+                                        'datum_vastgesteld' => $allergie->pivot->datum_vastgesteld ?? null,
+                                        'created_at' => $allergie->pivot->created_at ?? null
+                                    ]
+                                ];
+                            })
+                        ]
+                    ];
                 });
             }
 

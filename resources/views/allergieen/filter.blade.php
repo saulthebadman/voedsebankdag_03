@@ -110,56 +110,70 @@
                                             <tr class="hover:bg-gray-50">
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="font-semibold text-gray-900">{{ $gezin->naam }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $gezin->code }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $gezin->code ?? 'Geen code' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    <div class="text-sm text-gray-900">{{ $gezin->omschrijving }}</div>
+                                                    <div class="text-sm text-gray-900">{{ $gezin->omschrijving ?? 'Geen omschrijving' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        {{ $gezin->aantal_volwassenen }}
+                                                        {{ $gezin->aantal_volwassenen ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        {{ $gezin->aantal_kinderen }}
+                                                        {{ $gezin->aantal_kinderen ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                        {{ $gezin->aantal_babys }}
+                                                        {{ $gezin->aantal_babys ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     @php
-                                                        $vertegenwoordiger = $gezin->personen->where('is_vertegenwoordiger', true)->first();
+                                                        $vertegenwoordiger = null;
+                                                        if(isset($gezin->personen) && $gezin->personen && $gezin->personen->isNotEmpty()) {
+                                                            $vertegenwoordiger = $gezin->personen->where('is_vertegenwoordiger', true)->first();
+                                                        }
                                                     @endphp
                                                     @if($vertegenwoordiger)
-                                                        <div class="text-sm font-medium text-gray-900">{{ $vertegenwoordiger->volledige_naam }}</div>
+                                                        <div class="text-sm font-medium text-gray-900">{{ $vertegenwoordiger->volledige_naam ?? 'Onbekend' }}</div>
                                                     @else
                                                         <span class="text-sm text-gray-500">Geen vertegenwoordiger</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <div class="space-y-1">
-                                                        @foreach($gezin->personen as $persoon)
-                                                            <div class="text-xs bg-red-50 p-2 rounded border border-red-200">
-                                                                <strong class="block text-gray-700">{{ $persoon->volledige_naam }}:</strong>
-                                                                <div class="mt-1 flex flex-wrap gap-1">
-                                                                    @foreach($persoon->allergieen as $persoonAllergie)
-                                                                        <span class="inline-block px-2 py-1 text-xs font-semibold text-white 
-                                                                            @if($persoonAllergie->id === $allergie->id) bg-red-600 
-                                                                            @else bg-gray-400 
-                                                                            @endif rounded-full">
-                                                                            {{ $persoonAllergie->naam }}
-                                                                            @if($persoonAllergie->anafylactisch_risico === 'hoog')
-                                                                                ⚠️
-                                                                            @endif
-                                                                        </span>
-                                                                    @endforeach
+                                                        @if(isset($gezin->personen) && $gezin->personen && $gezin->personen->isNotEmpty())
+                                                            @foreach($gezin->personen as $persoon)
+                                                                <div class="text-xs bg-red-50 p-2 rounded border border-red-200">
+                                                                    <strong class="block text-gray-700">{{ $persoon->volledige_naam ?? 'Onbekende persoon' }}:</strong>
+                                                                    <div class="mt-1 flex flex-wrap gap-1">
+                                                                        @if(isset($persoon->allergieen) && $persoon->allergieen && $persoon->allergieen->isNotEmpty())
+                                                                            @foreach($persoon->allergieen as $persoonAllergie)
+                                                                                <span class="inline-block px-2 py-1 text-xs font-semibold text-white 
+                                                                                    @if($persoonAllergie->id === $allergie->id) bg-red-600 
+                                                                                    @else bg-gray-400 
+                                                                                    @endif rounded-full">
+                                                                                    {{ $persoonAllergie->naam ?? 'Onbekende allergie' }}
+                                                                                    @if(isset($persoonAllergie->anafylactisch_risico) && $persoonAllergie->anafylactisch_risico === 'hoog')
+                                                                                        ⚠️
+                                                                                    @endif
+                                                                                </span>
+                                                                            @endforeach
+                                                                        @else
+                                                                            <span class="text-gray-500">Geen allergieën bekend</span>
+                                                                        @endif
+                                                                    </div>
                                                                 </div>
+                                                            @endforeach
+                                                        @else
+                                                            <div class="text-xs text-gray-500 p-2">
+                                                                {{ $allergie->naam ?? 'Deze allergie' }} gevonden ({{ $gezin->aantal_personen_met_allergie ?? 0 }} personen)
                                                             </div>
-                                                        @endforeach
+                                                        @endif
+                                                    </div>
                                                         
                                                         <!-- Boek-icoon voor details -->
                                                         <div class="mt-2 flex justify-end">
@@ -169,7 +183,6 @@
                                                                 📖 Details
                                                             </a>
                                                         </div>
-                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach

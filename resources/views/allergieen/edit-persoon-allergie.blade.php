@@ -138,7 +138,7 @@
 
                             <!-- Bevestiging checkbox voor wijziging -->
                             <div class="flex items-start space-x-3">
-                                <input type="checkbox" id="bevestiging" required class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <input type="checkbox" id="bevestiging" name="bevestiging" value="1" required class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                                 <label for="bevestiging" class="text-sm text-gray-700">
                                     Ik bevestig dat deze allergiewijziging correct is en dat de persoon/gezin hiervan op de hoogte is. <span class="text-red-500">*</span>
                                 </label>

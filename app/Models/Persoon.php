@@ -13,7 +13,7 @@ class Persoon extends Model
     protected $fillable = [
         'gezin_id',
         'voornaam',
-        'tussenvoegsel',
+        'tussenvoegsel', 
         'achternaam',
         'geboortedatum',
         'type_persoon',
@@ -34,7 +34,7 @@ class Persoon extends Model
 
     public function gezin(): BelongsTo
     {
-        return $this->belongsTo(Gezin::class);
+        return $this->belongsTo(Gezin::class, 'gezin_id');
     }
 
     public function allergieen(): BelongsToMany

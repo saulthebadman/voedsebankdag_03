@@ -26,11 +26,11 @@ class AllergiePerPersoon extends Model
 
     public function persoon(): BelongsTo
     {
-        return $this->belongsTo(Persoon::class);
+        return $this->belongsTo(Persoon::class, 'persoon_id');
     }
 
     public function allergie(): BelongsTo
     {
-        return $this->belongsTo(Allergie::class);
+        return $this->belongsTo(Allergie::class, 'allergie_id');
     }
 }

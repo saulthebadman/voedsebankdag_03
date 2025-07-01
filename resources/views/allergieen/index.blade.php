@@ -75,34 +75,39 @@
                                             <tr class="hover:bg-gray-50">
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="font-semibold text-gray-900">{{ $gezin->naam }}</div>
-                                                    <div class="text-sm text-gray-500">{{ $gezin->code }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $gezin->code ?? 'Geen code' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    <div class="text-sm text-gray-900">{{ $gezin->omschrijving }}</div>
+                                                    <div class="text-sm text-gray-900">{{ $gezin->omschrijving ?? 'Gezin met allergieën' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        {{ $gezin->aantal_volwassenen }}
+                                                        {{ $gezin->aantal_volwassenen ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        {{ $gezin->aantal_kinderen }}
+                                                        {{ $gezin->aantal_kinderen ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 text-center">
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                        {{ $gezin->aantal_babys }}
+                                                        {{ $gezin->aantal_babys ?? 0 }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     @php
-                                                        $vertegenwoordiger = $gezin->personen->where('is_vertegenwoordiger', true)->first();
+                                                        $vertegenwoordiger = null;
+                                                        if (isset($gezin->personen) && is_object($gezin->personen) && method_exists($gezin->personen, 'where')) {
+                                                            $vertegenwoordiger = $gezin->personen->where('is_vertegenwoordiger', true)->first();
+                                                        }
                                                     @endphp
                                                     @if($vertegenwoordiger)
-                                                        <div class="text-sm font-medium text-gray-900">{{ $vertegenwoordiger->volledige_naam }}</div>
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $vertegenwoordiger->voornaam ?? '' }} {{ $vertegenwoordiger->achternaam ?? '' }}
+                                                        </div>
                                                     @else
-                                                        <span class="text-sm text-gray-500">Geen vertegenwoordiger</span>
+                                                        <span class="text-sm text-gray-500">Contactgegevens beschikbaar</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-6 py-4">

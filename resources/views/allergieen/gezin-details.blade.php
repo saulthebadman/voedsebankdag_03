@@ -77,13 +77,13 @@
                                         @foreach($personenMetAllergieen as $persoon)
                                             <tr class="hover:bg-gray-50">
                                                 <td class="px-6 py-4">
-                                                    <div class="font-semibold text-gray-900">{{ $persoon->volledige_naam }}</div>
+                                                    <div class="font-semibold text-gray-900">{{ $persoon->volledige_naam ?? 'Onbekende naam' }}</div>
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-900">
-                                                    {{ ucfirst($persoon->type_persoon) }}
+                                                    {{ ucfirst($persoon->type_persoon ?? 'Klant') }}
                                                 </td>
                                                 <td class="px-6 py-4 text-sm text-gray-900">
-                                                    @if($persoon->is_vertegenwoordiger)
+                                                    @if(isset($persoon->is_vertegenwoordiger) && $persoon->is_vertegenwoordiger)
                                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                             Vertegenwoordiger
                                                         </span>
@@ -93,27 +93,34 @@
                                                 </td>
                                                 <td class="px-6 py-4">
                                                     <div class="flex flex-wrap gap-1">
-                                                        @foreach($persoon->allergieen as $allergie)
-                                                            <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">
-                                                                {{ $allergie->naam }}
-                                                                @if($allergie->anafylactisch_risico === 'hoog')
-                                                                    ⚠️
-                                                                @endif
-                                                            </span>
-                                                        @endforeach
+                                                        @if(isset($persoon->allergieen) && $persoon->allergieen && $persoon->allergieen->isNotEmpty())
+                                                            @foreach($persoon->allergieen as $allergie)
+                                                                <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">
+                                                                    {{ $allergie->naam ?? 'Onbekende allergie' }}
+                                                                    @if(isset($allergie->anafylactisch_risico) && $allergie->anafylactisch_risico === 'hoog')
+                                                                        ⚠️
+                                                                    @endif
+                                                                </span>
+                                                            @endforeach
+                                                        @else
+                                                            <span class="text-gray-500 text-sm">Geen allergieën bekend</span>
+                                                        @endif
                                                     </div>
-                                                </td>
-                                                <td class="px-6 py-4 text-center">
-                                                    <div class="flex flex-col space-y-1">
-                                                        @foreach($persoon->allergieen as $allergie)
-                                                            <a href="{{ route('allergieen.edit-persoon-allergie', [$persoon->id, $allergie->id]) }}" 
-                                                               class="inline-flex items-center px-2 py-1 bg-orange-600 border border-transparent rounded text-xs text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                                               title="Wijzig {{ $allergie->naam }} allergie">
-                                                                ✏️ {{ $allergie->naam }}
-                                                            </a>
-                                                        @endforeach
-                                                    </div>
-                                                </td>
+                                                </td>                                <td class="px-6 py-4 text-center">
+                                    <div class="flex flex-col space-y-1">
+                                        @if(isset($persoon->allergieen) && $persoon->allergieen && $persoon->allergieen->isNotEmpty())
+                                            @foreach($persoon->allergieen as $allergie)
+                                                <a href="{{ route('allergieen.edit-persoon-allergie', [$persoon->id ?? 0, $allergie->id ?? 0]) }}" 
+                                                   class="inline-flex items-center px-2 py-1 bg-orange-600 border border-transparent rounded text-xs text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                                   title="Wijzig {{ $allergie->naam }} allergie">
+                                                    ✏️ {{ $allergie->naam }}
+                                                </a>
+                                            @endforeach
+                                        @else
+                                            <span class="text-gray-500 text-sm">Geen allergieën</span>
+                                        @endif
+                                    </div>
+                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>

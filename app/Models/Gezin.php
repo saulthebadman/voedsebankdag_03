@@ -31,6 +31,6 @@ class Gezin extends Model
 
     public function personen(): HasMany
     {
-        return $this->hasMany(Persoon::class);
+        return $this->hasMany(Persoon::class, 'gezin_id');
     }
 }
