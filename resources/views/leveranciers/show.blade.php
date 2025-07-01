@@ -25,6 +25,12 @@
                 <tr>
                     <td colspan="5" class="text-center bg-warning-subtle">Er zijn geen producten bekend voor deze leverancier</td>
                 </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td class="text-center">
+                        <a href="{{ route('leveranciers.edit', $leverancier) }}" class="btn btn-outline-secondary btn-sm">Klantgegevens wijzigen</a>
+                    </td>
+                </tr>
             @else
                 @foreach($leverancier->products as $product)
                     <tr>
@@ -39,6 +45,12 @@
                         </td>
                     </tr>
                 @endforeach
+                <tr>
+                    <td colspan="4"></td>
+                    <td class="text-center">
+                        <a href="{{ route('leveranciers.edit', $leverancier) }}" class="btn btn-outline-secondary btn-sm">Klantgegevens wijzigen</a>
+                    </td>
+                </tr>
             @endif
         </tbody>
     </table>

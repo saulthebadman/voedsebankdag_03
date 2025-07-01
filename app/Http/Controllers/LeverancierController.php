@@ -43,6 +43,26 @@ class LeverancierController extends Controller
         return view('leveranciers.show', compact('leverancier'));
     }
 
+    public function edit(Leverancier $leverancier)
+    {
+        $types = ['Bedrijf', 'Instelling', 'Overheid', 'Particulier', 'Donor'];
+        return view('leveranciers.edit', compact('leverancier', 'types'));
+    }
+
+    public function update(Request $request, Leverancier $leverancier)
+    {
+        $data = $request->validate([
+            'naam' => 'required',
+            'contactpersoon' => 'nullable',
+            'email' => 'nullable|email',
+            'mobiel' => 'nullable',
+            'leveranciernummer' => 'required',
+            'leverancier_type' => 'required',
+        ]);
+        $leverancier->update($data);
+        return redirect()->route('leveranciers.show', $leverancier)->with('success', 'Leverancier bijgewerkt!');
+    }
+
     public function destroy(Leverancier $leverancier)
     {
         $leverancier->delete();

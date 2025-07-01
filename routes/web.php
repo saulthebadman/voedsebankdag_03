@@ -19,6 +19,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
     Route::get('/leveranciers/{leverancier}', [LeverancierController::class, 'show'])->name('leveranciers.show');
     Route::delete('/leveranciers/{leverancier}', [LeverancierController::class, 'destroy'])->name('leveranciers.destroy');
+    Route::get('/leveranciers/{leverancier}/edit', [LeverancierController::class, 'edit'])->name('leveranciers.edit');
+    Route::put('/leveranciers/{leverancier}', [LeverancierController::class, 'update'])->name('leveranciers.update');
 
     Route::get('/leveranciers/{leverancier}/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/leveranciers/{leverancier}/products/{product}', [ProductController::class, 'update'])->name('products.update');
