@@ -13,7 +13,9 @@ use Exception;
 
 class AllergieController extends Controller
 {
-
+    /**
+     * Toon overzicht van alle gezinnen met allergieën
+     */
     public function index()
     {
         try {
