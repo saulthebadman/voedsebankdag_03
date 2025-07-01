@@ -1,32 +1,33 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Allergieën in het gezin: ') . $gezin->naam }}
+        <h2 class="heading-responsive">
+            <span class="desktop-only">{{ __('Allergieën in het gezin: ') . $gezin->naam }}</span>
+            <span class="mobile-only">{{ __('Allergieën: ') . $gezin->naam }}</span>
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-12">
+        <div class="container-responsive">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="p-responsive text-gray-900">
                     
                     <!-- Navigatie terug -->
                     <div class="mb-6">
-                        <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            ← Terug naar overzicht
+                        <a href="{{ route('allergieen.index') }}" class="btn-secondary-responsive w-full sm:w-auto">
+                            ← <span class="ml-1">Terug naar overzicht</span>
                         </a>
                     </div>
 
                     <!-- Success message -->
                     @if(session('success'))
-                        <div id="success-message" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div id="success-message" class="alert-success-responsive mb-6">
                             <div class="flex items-center">
-                                <div class="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mr-3">
-                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-full mr-3 flex-shrink-0">
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                                <p class="text-green-700 font-medium text-sm sm:text-base">{{ session('success') }}</p>
                             </div>
                         </div>
                         
@@ -45,9 +46,11 @@
 
                     <!-- Gezin informatie -->
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg">
-                        <p class="text-blue-800 mb-1"><strong>Gezinsnaam:</strong> {{ $gezin->naam }}</p>
-                        <p class="text-blue-800 mb-1"><strong>Omschrijving:</strong> {{ $gezin->omschrijving }}</p>
-                        <p class="text-blue-800"><strong>Totaal aantal personen:</strong> {{ $gezin->totaal_aantal_personen }}</p>
+                        <div class="space-y-2 sm:space-y-1">
+                            <p class="text-blue-800 text-sm sm:text-base"><strong>Gezinsnaam:</strong> {{ $gezin->naam }}</p>
+                            <p class="text-blue-800 text-sm sm:text-base"><strong>Omschrijving:</strong> {{ $gezin->omschrijving }}</p>
+                            <p class="text-blue-800 text-sm sm:text-base"><strong>Totaal aantal personen:</strong> {{ $gezin->totaal_aantal_personen }}</p>
+                        </div>
                     </div>
 
                     <!-- Allergieën per persoon tabel (Wireframe-03) -->

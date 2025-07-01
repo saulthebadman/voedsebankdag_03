@@ -1,48 +1,54 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Allergie wijzigen voor ') . $persoon->volledige_naam }}
+        <h2 class="heading-responsive">
+            <span class="desktop-only">{{ __('Allergie wijzigen voor ') . $persoon->volledige_naam }}</span>
+            <span class="mobile-only">{{ __('Allergie wijzigen') }}</span>
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-12">
+        <div class="container-responsive max-w-4xl">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                <div class="p-responsive text-gray-900">
                     
                     <!-- Navigatie terug -->
                     <div class="mb-6">
-                        <a href="{{ route('allergieen.gezin-details', $persoon->gezin_id) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            ← Terug naar gezin details
+                        <a href="{{ route('allergieen.gezin-details', $persoon->gezin_id) }}" class="btn-secondary-responsive w-full sm:w-auto">
+                            ← <span class="ml-1">Terug naar gezin details</span>
                         </a>
+                    </div>
+
+                    <!-- Mobile persoon info -->
+                    <div class="mobile-only mb-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-900">{{ $persoon->volledige_naam }}</p>
                     </div>
 
                     <!-- Error message -->
                     @if(session('error'))
-                        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div class="alert-error-responsive mb-6">
                             <div class="flex items-center">
-                                <div class="flex items-center justify-center w-8 h-8 bg-red-100 rounded-full mr-3">
-                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full mr-3 flex-shrink-0">
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </div>
-                                <p class="text-red-700 font-medium">{{ session('error') }}</p>
+                                <p class="text-red-700 font-medium text-sm sm:text-base">{{ session('error') }}</p>
                             </div>
                         </div>
                     @endif
 
                     <!-- Waarschuwing voor hoog risico (Scenario 2 - Wireframe-06) -->
                     @if($waarschuwing)
-                        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="flex items-center justify-center w-8 h-8 bg-red-100 rounded-full mr-3">
-                                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="alert-error-responsive mb-6">
+                            <div class="flex items-start">
+                                <div class="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full mr-3 flex-shrink-0 mt-0.5">
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-medium text-red-800 mb-1">⚠️ Medische waarschuwing</h3>
-                                    <p class="text-red-700">{{ $waarschuwing }}</p>
+                                    <h3 class="text-base sm:text-lg font-medium text-red-800 mb-1">⚠️ Medische waarschuwing</h3>
+                                    <p class="text-red-700 text-sm sm:text-base">{{ $waarschuwing }}</p>
                                 </div>
                             </div>
                         </div>
