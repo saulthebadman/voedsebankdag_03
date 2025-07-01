@@ -1,0 +1,94 @@
+@startuml Allergie MVC Abstract Architecture
+
+' MVC Architecture components
+abstract class Controller {
+    -model: Model
+    -view: View
+    +Controller(model: Model, view: View)
+    +handleRequest(): Response
+    +index(): View
+    +store(): Response
+    +update(): Response
+    +destroy(): Response
+}
+
+abstract class Model {
+    -db: Database
+    +Model(db: Database)
+    +save(): bool
+    +delete(): bool
+    +find(id: int): Model
+    +all(): Collection
+}
+
+abstract class View {
+    -data: array
+    +View(data: array)
+    +render(): string
+    +setData(data: array): void
+    +getData(): array
+}
+
+class Database {
+    +field: type
+    +method(type): type
+    +connect(): PDO
+    +query(sql: string): array
+    +execute(sql: string, params: array): bool
+}
+
+' Concrete implementations
+class AllergieController extends Controller {
+    +index(): View
+    +filter(): View
+    +gezinDetails(id: int): View
+    +editPersoonAllergie(id: int): View
+    +updatePersoonAllergie(id: int): Response
+}
+
+class AllergieModel extends Model {
+    -id: int
+    -naam: string
+    -beschrijving: string
+    +getAllergieen(): Collection
+    +findByNaam(naam: string): AllergieModel
+}
+
+class AllergieView extends View {
+    +renderIndex(): string
+    +renderFilter(): string
+    +renderGezinDetails(): string
+    +renderEdit(): string
+}
+
+' Inheritance relationships
+AllergieController --|> Controller
+AllergieModel --|> Model
+AllergieView --|> View
+
+' Composition relationships - MVC pattern
+Controller *-- Model : "uses"
+Controller *-- View : "uses"
+Model *-- Database : "uses"
+
+note top of Controller
+    Handles user requests
+    Coordinates Model and View
+end note
+
+note left of Model
+    Business logic
+    Data access
+end note
+
+note right of View
+    Presentation layer
+    Template rendering
+end note
+
+note bottom of Database
+    Data persistence
+    Query execution
+end note
+
+@enduml

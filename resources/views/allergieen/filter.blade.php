@@ -160,6 +160,15 @@
                                                                 </div>
                                                             </div>
                                                         @endforeach
+                                                        
+                                                        <!-- Boek-icoon voor details -->
+                                                        <div class="mt-2 flex justify-end">
+                                                            <a href="{{ route('allergieen.gezin-details', $gezin->id) }}" 
+                                                               class="inline-flex items-center px-2 py-1 bg-blue-600 border border-transparent rounded text-xs text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                                               title="Bekijk allergie details">
+                                                                📖 Details
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -170,14 +179,17 @@
                         @endif
                         
                         <!-- Terug en Home buttons (rechts onder de tabel) -->
-                        <div class="flex justify-end space-x-3 mt-6">
-                            <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                ← Terug
-                            </a>
-                            <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                🏠 Home
-                            </a>
-                        </div>
+                        @if(!$bericht)
+                            <div class="flex justify-end space-x-3 mt-6">
+                                <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    ← Terug
+                                </a>
+                                <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    🏠 Home
+                                </a>
+                            </div>
+                        @endif
+                      
                     </div>
                 </div>
             </div>

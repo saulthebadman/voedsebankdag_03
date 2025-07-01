@@ -98,24 +98,13 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-6 py-4">
-                                                    <div class="space-y-1">
-                                                        @foreach($gezin->personen as $persoon)
-                                                            @if($persoon->allergieen->isNotEmpty())
-                                                                <div class="text-xs bg-gray-50 p-2 rounded border">
-                                                                    <strong class="block text-gray-700">{{ $persoon->volledige_naam }}:</strong>
-                                                                    <div class="mt-1 flex flex-wrap gap-1">
-                                                                        @foreach($persoon->allergieen as $allergie)
-                                                                            <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded-full">
-                                                                                {{ $allergie->naam }}
-                                                                                @if($allergie->anafylactisch_risico === 'hoog')
-                                                                                    ⚠️
-                                                                                @endif
-                                                                            </span>
-                                                                        @endforeach
-                                                                    </div>
-                                                                </div>
-                                                            @endif
-                                                        @endforeach
+                                                    <div class="text-center">
+                                                        <!-- Boek-icoon voor details (Wireframe-02) -->
+                                                        <a href="{{ route('allergieen.gezin-details', $gezin->id) }}" 
+                                                           class="inline-flex items-center px-3 py-2 bg-blue-600 border border-transparent rounded text-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                                           title="Bekijk allergie details">
+                                                            📖 Details
+                                                        </a>
                                                     </div>
                                                 </td>
                                             </tr>

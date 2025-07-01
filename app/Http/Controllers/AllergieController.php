@@ -62,4 +62,71 @@ class AllergieController extends Controller
 
         return view('allergieen.filter', compact('gezinnenMetAllergie', 'allergieen', 'allergie', 'bericht'));
     }
+
+    /**
+     * Toon allergieën detail pagina voor een specifiek gezin (Wireframe-03)
+     */
+    public function showGezinDetails($gezinId)
+    {
+        $gezin = Gezin::with(['personen.allergieen'])->findOrFail($gezinId);
+        
+        // Alleen personen met allergieën tonen
+        $personenMetAllergieen = $gezin->personen->filter(function($persoon) {
+            return $persoon->allergieen->isNotEmpty();
+        });
+
+        return view('allergieen.gezin-details', compact('gezin', 'personenMetAllergieen'));
+    }
+
+    /**
+     * Toon edit form voor een specifieke allergie van een persoon (Wireframe-04)
+     */
+    public function editPersoonAllergie($persoonId, $allergieId)
+    {
+        $persoon = Persoon::with(['allergieen', 'gezin'])->findOrFail($persoonId);
+        $huidigeAllergie = $persoon->allergieen->firstWhere('id', $allergieId);
+        
+        if (!$huidigeAllergie) {
+            return redirect()->back()->with('error', 'Allergie niet gevonden voor deze persoon.');
+        }
+
+        // Check voor hoog anafylactisch risico (Scenario 2 - Wireframe-06)
+        $waarschuwing = null;
+        if ($huidigeAllergie->anafylactisch_risico === 'hoog') {
+            $waarschuwing = "Voor het wijzigen van deze allergie wordt geadviseerd eerst een arts te raadplegen vanwege een hoog risico op een anafylactisch shock";
+        }
+
+        $allergieen = Allergie::orderBy('naam')->get();
+
+        return view('allergieen.edit-persoon-allergie', compact('persoon', 'huidigeAllergie', 'allergieen', 'waarschuwing'));
+    }
+
+    /**
+     * Update allergie voor een persoon (Wireframe-05)
+     */
+    public function updatePersoonAllergie(Request $request, $persoonId, $allergieId)
+    {
+        $request->validate([
+            'nieuwe_allergie_id' => 'required|exists:allergies,id'
+        ]);
+
+        $persoon = Persoon::findOrFail($persoonId);
+        $nieuweAllergieId = $request->nieuwe_allergie_id;
+
+        // Controleer of de persoon de nieuwe allergie al heeft
+        if ($persoon->allergieen()->where('allergie_id', $nieuweAllergieId)->exists()) {
+            return redirect()->back()->with('error', 'Deze persoon heeft deze allergie al.');
+        }
+
+        // Verwijder oude allergie en voeg nieuwe toe
+        $persoon->allergieen()->detach($allergieId);
+        $persoon->allergieen()->attach($nieuweAllergieId, [
+            'is_actief' => true,
+            'datum_aangemaakt' => now(),
+            'datum_gewijzigd' => now()
+        ]);
+
+        return redirect()->route('allergieen.gezin-details', $persoon->gezin_id)
+                       ->with('success', 'De wijziging is doorgevoerd');
+    }
 }

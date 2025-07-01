@@ -1,0 +1,127 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+abstract class Model {
+    -db: Database
+    +Model(db: Database)
+    +find(id: int): Model
+    +save(): boolean
+    +delete(): boolean
+    +all(): array
+}
+
+class Database {
+    +connection: PDO
+    +host: string
+    +database: string
+    +username: string
+    +password: string
+    +Database(host: string, database: string, username: string, password: string)
+    +connect(): PDO
+    +query(sql: string): array
+    +execute(sql: string, params: array): boolean
+    +lastInsertId(): int
+    +beginTransaction(): void
+    +commit(): void
+    +rollback(): void
+}
+
+class Allergie {
+    +id: int
+    +naam: string
+    +beschrijving: string
+    +is_actief: boolean
+    +opmerking: string
+    +datum_aangemaakt: datetime
+    +datum_gewijzigd: datetime
+    +Allergie(db: Database)
+    +getAllergieën(): array
+    +getById(id: int): Allergie
+    +create(data: array): boolean
+    +update(id: int, data: array): boolean
+    +deactivate(id: int): boolean
+}
+
+class Persoon {
+    +id: int
+    +voornaam: string
+    +achternaam: string
+    +geboortedatum: date
+    +gezin_id: int
+    +is_actief: boolean
+    +opmerking: string
+    +datum_aangemaakt: datetime
+    +datum_gewijzigd: datetime
+    +Persoon(db: Database)
+    +getPersonen(): array
+    +getById(id: int): Persoon
+    +getByGezin(gezin_id: int): array
+    +create(data: array): boolean
+    +update(id: int, data: array): boolean
+}
+
+class AllergiePerPersoon {
+    +id: int
+    +persoon_id: int
+    +allergie_id: int
+    +ernst: string
+    +opmerking: string
+    +datum_aangemaakt: datetime
+    +datum_gewijzigd: datetime
+    +AllergiePerPersoon(db: Database)
+    +getByPersoon(persoon_id: int): array
+    +getByAllergie(allergie_id: int): array
+    +exists(persoon_id: int, allergie_id: int): boolean
+    +create(persoon_id: int, allergie_id: int, ernst: string, opmerking: string): boolean
+    +update(id: int, data: array): boolean
+    +delete(id: int): boolean
+}
+
+class Gezin {
+    +id: int
+    +naam: string
+    +adres: string
+    +postcode: string
+    +woonplaats: string
+    +is_actief: boolean
+    +opmerking: string
+    +datum_aangemaakt: datetime
+    +datum_gewijzigd: datetime
+    +Gezin(db: Database)
+    +getGezinnen(): array
+    +getById(id: int): Gezin
+    +create(data: array): boolean
+    +update(id: int, data: array): boolean
+}
+
+' Inheritance relationships
+Model <|-- Allergie
+Model <|-- Persoon
+Model <|-- AllergiePerPersoon
+Model <|-- Gezin
+
+' Composition relationship
+Model *-- Database : "uses"
+
+' Association relationships
+AllergiePerPersoon --> Persoon : "belongs to"
+AllergiePerPersoon --> Allergie : "refers to"
+Persoon --> Gezin : "member of"
+
+note top of Model
+    Abstract base class for all models
+    Provides common database operations
+end note
+
+note right of Database
+    Database connection and
+    query execution layer
+end note
+
+@enduml

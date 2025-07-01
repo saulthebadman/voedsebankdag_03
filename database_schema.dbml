@@ -1,0 +1,135 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table allergie {
+  id integer [primary key]
+}
+
+Table allergie_per_persoon {
+  id integer [primary key]
+  persoon_id integer [not null]
+  allergie_id integer [not null]
+}
+
+Table rol {
+  id integer [primary key]
+}
+
+Table rol_per_gebruiker {
+  id integer [primary key]
+  gebruiker_id integer [not null]
+  rol_id integer [not null]
+}
+
+Table categorie {
+  id integer [primary key]
+}
+
+Table contact {
+  id integer [primary key]
+}
+
+Table eetwens_per_gezin {
+  id integer [primary key]
+  gezin_id integer [not null]
+  eetwens_id integer [not null]
+}
+
+Table contact_per_leverancier {
+  id integer [primary key]
+  leverancier_id integer [not null]
+  contact_id integer [not null]
+}
+
+Table contact_per_gezin {
+  id integer [primary key]
+  gezin_id integer [not null]
+  contact_id integer [not null]
+}
+
+Table eetwens {
+  id integer [primary key]
+}
+
+Table gebruiker {
+  id integer [primary key]
+  persoon_id integer [not null]
+}
+
+Table gezin {
+  id integer [primary key]
+}
+
+Table leverancier {
+  id integer [primary key]
+}
+
+Table magazijn {
+  id integer [primary key]
+}
+
+Table persoon {
+  id integer [primary key]
+  gezin_id integer
+}
+
+Table product {
+  id integer [primary key]
+  categorie_id integer [not null]
+}
+
+Table product_per_voedselpakket {
+  id integer [primary key]
+  voedselpakket_id integer [not null]
+  product_id integer [not null]
+}
+
+Table product_per_leverancier {
+  id integer [primary key]
+  leverancier_id integer [not null]
+  product_id integer [not null]
+}
+
+Table product_per_magazijn {
+  id integer [primary key]
+  product_id integer [not null]
+  magazijn_id integer [not null]
+}
+
+Table voedselpakket {
+  id integer [primary key]
+  gezin_id integer [not null]
+}
+
+// Relationships
+Ref: allergie_per_persoon.persoon_id > persoon.id
+Ref: allergie_per_persoon.allergie_id > allergie.id
+
+Ref: rol_per_gebruiker.gebruiker_id > gebruiker.id
+Ref: rol_per_gebruiker.rol_id > rol.id
+
+Ref: eetwens_per_gezin.gezin_id > gezin.id
+Ref: eetwens_per_gezin.eetwens_id > eetwens.id
+
+Ref: contact_per_leverancier.leverancier_id > leverancier.id
+Ref: contact_per_leverancier.contact_id > contact.id
+
+Ref: contact_per_gezin.gezin_id > gezin.id
+Ref: contact_per_gezin.contact_id > contact.id
+
+Ref: gebruiker.persoon_id > persoon.id
+
+Ref: persoon.gezin_id > gezin.id
+
+Ref: product.categorie_id > categorie.id
+
+Ref: product_per_voedselpakket.voedselpakket_id > voedselpakket.id
+Ref: product_per_voedselpakket.product_id > product.id
+
+Ref: product_per_leverancier.leverancier_id > leverancier.id
+Ref: product_per_leverancier.product_id > product.id
+
+Ref: product_per_magazijn.product_id > product.id
+Ref: product_per_magazijn.magazijn_id > magazijn.id
+
+Ref: voedselpakket.gezin_id > gezin.id

@@ -20,6 +20,9 @@ Route::middleware('auth')->group(function () {
     // Allergie routes
     Route::get('/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
     Route::get('/allergieen/filter', [AllergieController::class, 'filterByAllergie'])->name('allergieen.filter');
+    Route::get('/allergieen/gezin/{gezin}', [AllergieController::class, 'showGezinDetails'])->name('allergieen.gezin-details');
+    Route::get('/allergieen/persoon/{persoon}/allergie/{allergie}/edit', [AllergieController::class, 'editPersoonAllergie'])->name('allergieen.edit-persoon-allergie');
+    Route::put('/allergieen/persoon/{persoon}/allergie/{allergie}', [AllergieController::class, 'updatePersoonAllergie'])->name('allergieen.update-persoon-allergie');
 });
 
 require __DIR__.'/auth.php';
