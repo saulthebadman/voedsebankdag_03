@@ -34,15 +34,20 @@
             @else
                 @foreach($leverancier->products as $product)
                     <tr>
-                        <td>{{ $product->naam }}</td>
-                        <td>{{ $product->soort_allergie ?? '' }}</td>
-                        <td>{{ $product->barcode ?? '' }}</td>
-                        <td>{{ $product->houdbaarheidsdatum }}</td>
-                        <td class="text-center">
-                            <a href="{{ route('products.edit', [$leverancier, $product]) }}" class="btn btn-link p-0" title="Wijzig houdbaarheidsdatum">
-                                <span style="font-size:1.2rem; color:#1a7f37;">&#9998;</span>
-                            </a>
-                        </td>
+                        <form method="POST" action="{{ route('products.inlineUpdate', [$leverancier, $product]) }}">
+                            @csrf
+                            @method('PUT')
+                            <td><input type="text" name="naam" value="{{ $product->naam }}" class="form-control form-control-sm" required></td>
+                            <td><input type="text" name="soort_allergie" value="{{ $product->soort_allergie }}" class="form-control form-control-sm"></td>
+                            <td><input type="text" name="barcode" value="{{ $product->barcode }}" class="form-control form-control-sm"></td>
+                            <td>{{ $product->houdbaarheidsdatum }}</td>
+                            <td class="text-center d-flex flex-column align-items-center" style="gap:4px;">
+                                <a href="{{ route('products.edit', [$leverancier, $product]) }}" class="btn btn-link p-0" title="Wijzig houdbaarheidsdatum">
+                                    <span style="font-size:1.2rem; color:#1a7f37;">&#9998;</span>
+                                </a>
+                                <button type="submit" class="btn btn-outline-primary btn-sm mt-1">Opslaan</button>
+                            </td>
+                        </form>
                     </tr>
                 @endforeach
                 <tr>
