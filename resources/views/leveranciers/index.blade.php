@@ -39,10 +39,10 @@
             @forelse($leveranciers as $l)
                 <tr>
                     <td>{{ $l->naam }}</td>
-                    <td>{{ $l->contactpersoon }}</td>
-                    <td>{{ $l->email }}</td>
-                    <td>{{ $l->mobiel }}</td>
-                    <td>{{ $l->leveranciernummer }}</td>
+                    <td>{{ $l->contact_persoon }}</td>
+                    <td>{{ $l->email ?? '-' }}</td>
+                    <td>{{ $l->mobiel ?? '-' }}</td>
+                    <td>{{ $l->leverancier_nummer }}</td>
                     <td>{{ $l->leverancier_type }}</td>
                     <td class="text-center">
                         <a href="{{ route('leveranciers.show', $l) }}" class="btn btn-outline-info btn-sm" title="Product details">
