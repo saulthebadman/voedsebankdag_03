@@ -13,22 +13,25 @@
                     <!-- Filter sectie -->
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                         <h3 class="subheading-responsive mb-4">Filter op allergie</h3>
-                        <form method="GET" action="{{ route('allergieen.filter') }}" class="form-responsive">
+                        <form method="GET" action="{{ route('allergieen.filter') }}" class="form-responsive" id="filterForm">
                             <div class="form-group-responsive">
                                 <label for="allergie_id" class="form-label-responsive">
-                                    Selecteer allergie:
+                                    Selecteer allergie: <span class="text-red-500">*</span>
                                 </label>
                                 <div class="w-full sm:w-3/4">
-                                    <select name="allergie_id" id="allergie_id" class="form-input-responsive">
+                                    <select name="allergie_id" id="allergie_id" required class="form-input-responsive">
                                         <option value="">-- Kies een allergie --</option>
                                         @foreach($allergieen as $allergie)
                                             <option value="{{ $allergie->id }}">{{ $allergie->naam }}</option>
                                         @endforeach
                                     </select>
+                                    @error('allergie_id')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="flex justify-start sm:justify-end mt-4">
-                                <button type="submit" class="btn-primary-responsive w-full sm:w-auto">
+                                <button type="submit" id="filterBtn" disabled class="btn-secondary-responsive w-full sm:w-auto">
                                     <span class="mobile-only">🔍</span>
                                     <span class="desktop-only">Toon Gezinnen</span>
                                     <span class="mobile-only ml-2">Zoeken</span>
@@ -180,4 +183,47 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const allergieSelect = document.getElementById('allergie_id');
+        const filterBtn = document.getElementById('filterBtn');
+        const form = document.getElementById('filterForm');
+
+        // Functie om filter button status te updaten
+        function updateFilterButton() {
+            if (allergieSelect.value) {
+                filterBtn.disabled = false;
+                filterBtn.classList.remove('btn-secondary-responsive');
+                filterBtn.classList.add('btn-primary-responsive');
+                filterBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                filterBtn.disabled = true;
+                filterBtn.classList.add('btn-secondary-responsive');
+                filterBtn.classList.remove('btn-primary-responsive');
+                filterBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Event listener voor select change
+        allergieSelect.addEventListener('change', updateFilterButton);
+
+        // Form validatie bij submit
+        form.addEventListener('submit', function(e) {
+            if (!allergieSelect.value) {
+                e.preventDefault();
+                alert('Selecteer eerst een allergie om te filteren.');
+                allergieSelect.focus();
+                return false;
+            }
+
+            // Disable button na submit om dubbele submits te voorkomen
+            filterBtn.disabled = true;
+            filterBtn.textContent = '⏳ Laden...';
+        });
+
+        // Initial check
+        updateFilterButton();
+    });
+    </script>
 </x-app-layout>

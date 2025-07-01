@@ -17,12 +17,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Allergie routes
-    Route::get('/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
-    Route::get('/allergieen/filter', [AllergieController::class, 'filterByAllergie'])->name('allergieen.filter');
-    Route::get('/allergieen/gezin/{gezin}', [AllergieController::class, 'showGezinDetails'])->name('allergieen.gezin-details');
-    Route::get('/allergieen/persoon/{persoon}/allergie/{allergie}/edit', [AllergieController::class, 'editPersoonAllergie'])->name('allergieen.edit-persoon-allergie');
-    Route::put('/allergieen/persoon/{persoon}/allergie/{allergie}', [AllergieController::class, 'updatePersoonAllergie'])->name('allergieen.update-persoon-allergie');
+    // Allergie routes met extra beveiliging
+    Route::middleware(['allergie.security'])->group(function () {
+        Route::get('/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
+        Route::get('/allergieen/filter', [AllergieController::class, 'filterByAllergie'])->name('allergieen.filter');
+        Route::get('/allergieen/gezin/{gezin}', [AllergieController::class, 'showGezinDetails'])->name('allergieen.gezin-details');
+        Route::get('/allergieen/persoon/{persoon}/allergie/{allergie}/edit', [AllergieController::class, 'editPersoonAllergie'])->name('allergieen.edit-persoon-allergie');
+        Route::put('/allergieen/persoon/{persoon}/allergie/{allergie}', [AllergieController::class, 'updatePersoonAllergie'])->name('allergieen.update-persoon-allergie');
+        
+        // API routes voor AJAX calls
+        Route::get('/api/allergieen/statistieken', [AllergieController::class, 'apiStatistieken'])->name('api.allergieen.statistieken');
+        Route::get('/api/allergieen/populair/{limiet?}', [AllergieController::class, 'getPopulaireAllergieen'])->name('api.allergieen.populair');
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -191,40 +191,4 @@
             </div>
         </div>
     </div>
-
-                        <!-- Placeholder voor andere functionaliteiten -->
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                            <div class="flex items-center mb-4">
-                                <div class="flex items-center justify-center w-12 h-12 bg-gray-400 rounded-lg">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                </div>
-                                <h4 class="ml-3 text-lg font-medium text-gray-700">Leveranciers</h4>
-                            </div>
-                            <p class="text-gray-600 mb-4">Beheer leveranciers en hun producten</p>
-                            <button disabled class="inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed">
-                                Binnenkort beschikbaar
-                            </button>
-                        </div>
-
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                            <div class="flex items-center mb-4">
-                                <div class="flex items-center justify-center w-12 h-12 bg-gray-400 rounded-lg">
-                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                </div>
-                                <h4 class="ml-3 text-lg font-medium text-gray-700">Voedselpakketten</h4>
-                            </div>
-                            <p class="text-gray-600 mb-4">Samenstellen en beheren van voedselpakketten</p>
-                            <button disabled class="inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed">
-                                Binnenkort beschikbaar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </x-app-layout>

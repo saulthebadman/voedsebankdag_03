@@ -96,19 +96,19 @@
                     <div class="mb-6">
                         <h4 class="text-md font-medium text-gray-900 mb-4">Allergie wijzigen</h4>
                         
-                        <form method="POST" action="{{ route('allergieen.update-persoon-allergie', [$persoon->id, $huidigeAllergie->id]) }}" class="space-y-6">
+                        <form method="POST" action="{{ route('allergieen.update-persoon-allergie', [$persoon->id, $huidigeAllergie->id]) }}" class="space-y-6" id="allergieWijzigForm">
                             @csrf
                             @method('PUT')
                             
                             <div>
                                 <label for="nieuwe_allergie_id" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Selecteer nieuwe allergie:
+                                    Selecteer nieuwe allergie: <span class="text-red-500">*</span>
                                 </label>
                                 <select name="nieuwe_allergie_id" id="nieuwe_allergie_id" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                                     <option value="">-- Kies een allergie --</option>
                                     @foreach($allergieen as $allergie)
                                         @if($allergie->id !== $huidigeAllergie->id)
-                                            <option value="{{ $allergie->id }}" data-risico="{{ $allergie->anafylactisch_risico }}">
+                                            <option value="{{ $allergie->id }}" data-risico="{{ $allergie->anafylactisch_risico }}" {{ old('nieuwe_allergie_id') == $allergie->id ? 'selected' : '' }}>
                                                 {{ $allergie->naam }} 
                                                 ({{ ucfirst(str_replace('_', ' ', $allergie->anafylactisch_risico)) }} risico)
                                                 @if($allergie->anafylactisch_risico === 'hoog') ⚠️ @endif
@@ -116,10 +116,39 @@
                                         @endif
                                     @endforeach
                                 </select>
+                                @error('nieuwe_allergie_id')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                
+                                <!-- Waarschuwing voor hoog risico allergie -->
+                                <div id="hogeRisicoWaarschuwing" class="hidden mt-3 p-3 bg-red-50 border-l-4 border-red-400 rounded">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h3 class="text-sm font-medium text-red-800">⚠️ Hoog anafylactisch risico</h3>
+                                            <p class="mt-1 text-sm text-red-700">Deze allergie heeft een hoog anafylactisch risico. Zorg ervoor dat de wijziging correct is.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
+                            <!-- Bevestiging checkbox voor wijziging -->
+                            <div class="flex items-start space-x-3">
+                                <input type="checkbox" id="bevestiging" required class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="bevestiging" class="text-sm text-gray-700">
+                                    Ik bevestig dat deze allergiewijziging correct is en dat de persoon/gezin hiervan op de hoogte is. <span class="text-red-500">*</span>
+                                </label>
+                            </div>
+                            @error('bevestiging')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+
                             <div class="flex items-center space-x-4">
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <button type="submit" id="submitBtn" disabled class="inline-flex items-center px-4 py-2 bg-gray-400 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest cursor-not-allowed transition ease-in-out duration-150">
                                     ✓ Wijzig Allergie
                                 </button>
                                 
@@ -159,4 +188,91 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const allergieSelect = document.getElementById('nieuwe_allergie_id');
+        const bevestigingCheckbox = document.getElementById('bevestiging');
+        const submitBtn = document.getElementById('submitBtn');
+        const hogeRisicoWaarschuwing = document.getElementById('hogeRisicoWaarschuwing');
+        const form = document.getElementById('allergieWijzigForm');
+
+        // Functie om submit button status te updaten
+        function updateSubmitButton() {
+            const allergieGeselecteerd = allergieSelect.value !== '';
+            const bevestigd = bevestigingCheckbox.checked;
+            
+            if (allergieGeselecteerd && bevestigd) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:bg-green-700', 'active:bg-green-900', 'focus:outline-none', 'focus:ring-2', 'focus:ring-green-500', 'focus:ring-offset-2', 'cursor-pointer');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:bg-green-700', 'active:bg-green-900', 'focus:outline-none', 'focus:ring-2', 'focus:ring-green-500', 'focus:ring-offset-2', 'cursor-pointer');
+            }
+        }
+
+        // Functie om hoog risico waarschuwing te tonen/verbergen
+        function toggleHoogRisicoWaarschuwing() {
+            const geselecteerdeOptie = allergieSelect.options[allergieSelect.selectedIndex];
+            if (geselecteerdeOptie && geselecteerdeOptie.dataset.risico === 'hoog') {
+                hogeRisicoWaarschuwing.classList.remove('hidden');
+            } else {
+                hogeRisicoWaarschuwing.classList.add('hidden');
+            }
+        }
+
+        // Event listeners
+        allergieSelect.addEventListener('change', function() {
+            updateSubmitButton();
+            toggleHoogRisicoWaarschuwing();
+        });
+
+        bevestigingCheckbox.addEventListener('change', updateSubmitButton);
+
+        // Form validatie bij submit
+        form.addEventListener('submit', function(e) {
+            if (!allergieSelect.value) {
+                e.preventDefault();
+                alert('Selecteer eerst een nieuwe allergie.');
+                allergieSelect.focus();
+                return false;
+            }
+
+            if (!bevestigingCheckbox.checked) {
+                e.preventDefault();
+                alert('Bevestig eerst dat de wijziging correct is.');
+                bevestigingCheckbox.focus();
+                return false;
+            }
+
+            // Extra bevestiging voor hoog risico allergieën
+            const geselecteerdeOptie = allergieSelect.options[allergieSelect.selectedIndex];
+            if (geselecteerdeOptie && geselecteerdeOptie.dataset.risico === 'hoog') {
+                const confirmatie = confirm('⚠️ WAARSCHUWING: U gaat wijzigen naar een allergie met hoog anafylactisch risico.\n\nWeet u zeker dat u wilt doorgaan?');
+                if (!confirmatie) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            // Laatste bevestiging
+            const allergieName = geselecteerdeOptie ? geselecteerdeOptie.text.split(' (')[0] : '';
+            const confirmatie = confirm(`Weet u zeker dat u de allergie wilt wijzigen naar "${allergieName}"?\n\nDeze actie kan niet ongedaan gemaakt worden.`);
+            if (!confirmatie) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Disable submit button na submit om dubbele submits te voorkomen
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Bezig met wijzigen...';
+        });
+
+        // Initial check
+        updateSubmitButton();
+        toggleHoogRisicoWaarschuwing();
+    });
+    </script>
 </x-app-layout>
