@@ -82,39 +82,80 @@
                                 Gezinnen met allergie "{{ $allergie->naam }}" ({{ $gezinnenMetAllergie->count() }} {{ $gezinnenMetAllergie->count() === 1 ? 'gezin' : 'gezinnen' }})
                             </h3>
                             
-                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                @foreach($gezinnenMetAllergie as $gezin)
-                                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                                        <div class="mb-3">
-                                            <h4 class="font-semibold text-lg text-gray-900">{{ $gezin->naam }}</h4>
-                                            <p class="text-sm text-gray-600">Code: {{ $gezin->code }}</p>
-                                            <p class="text-sm text-gray-600">{{ $gezin->omschrijving }}</p>
-                                            <p class="text-sm text-gray-600">Totaal personen: {{ $gezin->totaal_aantal_personen }}</p>
-                                        </div>
-
-                                        <div class="space-y-2">
-                                            <h5 class="font-medium text-sm text-gray-700">Personen met {{ $allergie->naam }} allergie:</h5>
-                                            @foreach($gezin->personen as $persoon)
-                                                <div class="text-sm bg-red-50 p-2 rounded border border-red-200">
-                                                    <strong>{{ $persoon->volledige_naam }}</strong>
-                                                    <div class="mt-1">
-                                                        @foreach($persoon->allergieen as $persoonAllergie)
-                                                            <span class="inline-block px-2 py-1 text-xs font-semibold text-white 
-                                                                @if($persoonAllergie->id === $allergie->id) bg-red-600 
-                                                                @else bg-gray-400 
-                                                                @endif rounded-full mr-1 mb-1">
-                                                                {{ $persoonAllergie->naam }}
-                                                                @if($persoonAllergie->anafylactisch_risico === 'hoog')
-                                                                    ⚠️
-                                                                @endif
-                                                            </span>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Naam</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Omschrijving</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Volwassenen</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Kinderen</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Baby's</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Vertegenwoordiger</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">{{ $allergie->naam }} Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        @foreach($gezinnenMetAllergie as $gezin)
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="font-semibold text-gray-900">{{ $gezin->naam }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $gezin->code }}</div>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="text-sm text-gray-900">{{ $gezin->omschrijving }}</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        {{ $gezin->aantal_volwassenen }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        {{ $gezin->aantal_kinderen }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 text-center">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                        {{ $gezin->aantal_babys }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    @php
+                                                        $vertegenwoordiger = $gezin->personen->where('is_vertegenwoordiger', true)->first();
+                                                    @endphp
+                                                    @if($vertegenwoordiger)
+                                                        <div class="text-sm font-medium text-gray-900">{{ $vertegenwoordiger->volledige_naam }}</div>
+                                                    @else
+                                                        <span class="text-sm text-gray-500">Geen vertegenwoordiger</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="space-y-1">
+                                                        @foreach($gezin->personen as $persoon)
+                                                            <div class="text-xs bg-red-50 p-2 rounded border border-red-200">
+                                                                <strong class="block text-gray-700">{{ $persoon->volledige_naam }}:</strong>
+                                                                <div class="mt-1 flex flex-wrap gap-1">
+                                                                    @foreach($persoon->allergieen as $persoonAllergie)
+                                                                        <span class="inline-block px-2 py-1 text-xs font-semibold text-white 
+                                                                            @if($persoonAllergie->id === $allergie->id) bg-red-600 
+                                                                            @else bg-gray-400 
+                                                                            @endif rounded-full">
+                                                                            {{ $persoonAllergie->naam }}
+                                                                            @if($persoonAllergie->anafylactisch_risico === 'hoog')
+                                                                                ⚠️
+                                                                            @endif
+                                                                        </span>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
                                                         @endforeach
                                                     </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         @endif
                     </div>
