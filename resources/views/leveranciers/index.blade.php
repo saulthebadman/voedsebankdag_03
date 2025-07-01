@@ -14,7 +14,13 @@
         <a href="{{ route('leveranciers.create') }}" class="btn btn-success ms-2">Leverancier toevoegen</a>
     </form>
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success fadeout" id="alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('deleted'))
+        <div class="alert alert-danger fadeout" id="alert-deleted">{{ session('deleted') }}</div>
+    @endif
+    @if(session('updated'))
+        <div class="alert alert-primary fadeout" id="alert-updated">{{ session('updated') }}</div>
     @endif
     <table class="table table-bordered align-middle">
         <thead style="background:#f8f8f8;">

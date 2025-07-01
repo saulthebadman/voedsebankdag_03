@@ -36,4 +36,20 @@
             </main>
         </div>
     </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('.fadeout').forEach(function(el) {
+                    el.classList.add('show-fadeout');
+                    setTimeout(function() { el.remove(); }, 600);
+                });
+            }, 2000); // 2 seconden
+        });
+    </script>
+    <style>
+        .show-fadeout {
+            opacity: 0 !important;
+            transition: opacity 0.6s;
+        }
+    </style>
 </html>

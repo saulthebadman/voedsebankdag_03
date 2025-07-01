@@ -3,6 +3,15 @@
 @section('content')
 <div class="container mt-5" style="max-width:600px;">
     <h2 style="color:#1a7f37; font-size:2rem; text-decoration:underline;">Klantgegevens wijzigen</h2>
+    @if(session('success'))
+        <div class="alert alert-success fadeout" id="alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('deleted'))
+        <div class="alert alert-danger fadeout" id="alert-deleted">{{ session('deleted') }}</div>
+    @endif
+    @if(session('updated'))
+        <div class="alert alert-primary fadeout" id="alert-updated">{{ session('updated') }}</div>
+    @endif
     <form method="POST" action="{{ route('leveranciers.update', $leverancier) }}" class="mt-4">
         @csrf
         @method('PUT')
