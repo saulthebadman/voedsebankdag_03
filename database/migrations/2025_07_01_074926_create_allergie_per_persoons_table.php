@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('persoon_id')->constrained('persoons')->onDelete('cascade');
             $table->foreignId('allergie_id')->constrained('allergies')->onDelete('cascade');
             
-            
+            // Systeem velden
             $table->boolean('is_actief')->default(true);
             $table->string('opmerking', 255)->nullable();
             $table->datetime('datum_aangemaakt', 6)->default(now());
