@@ -28,4 +28,18 @@ class ProductController extends Controller
         $product->save();
         return redirect()->route('leveranciers.show', $leverancier)->with('success', 'De houdbaarheidsdatum is gewijzigd');
     }
+
+    public function inlineUpdate(Request $request, Leverancier $leverancier, Product $product)
+    {
+        $request->validate([
+            'naam' => 'required|string|max:255',
+            'soort_allergie' => 'nullable|string|max:255',
+            'barcode' => 'nullable|string|max:255',
+        ]);
+        $product->naam = $request->naam;
+        $product->soort_allergie = $request->soort_allergie;
+        $product->barcode = $request->barcode;
+        $product->save();
+        return redirect()->route('leveranciers.show', $leverancier)->with('success', 'Productgegevens zijn bijgewerkt');
+    }
 }
