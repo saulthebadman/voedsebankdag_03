@@ -1,10 +1,10 @@
 -- Voedselbank Maaskantje Database Create Script
--- Complete database structure for allergie module and related tables
+-- Complete database structure with correct order
 
 -- Disable foreign key checks temporarily
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Drop tables if they exist (in correct order due to foreign keys)
+-- Drop all tables
 DROP TABLE IF EXISTS allergie_per_persoon;
 DROP TABLE IF EXISTS rol_per_gebruiker;
 DROP TABLE IF EXISTS eetwens_per_gezin;
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS eetwens;
 DROP TABLE IF EXISTS leverancier;
 DROP TABLE IF EXISTS magazijn;
 
--- Create base tables first (no foreign keys)
+-- 1. Base tables (no foreign keys)
 CREATE TABLE gezin (
     id INT PRIMARY KEY AUTO_INCREMENT,
     naam VARCHAR(255) NOT NULL,
@@ -120,154 +120,19 @@ CREATE TABLE magazijn (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE allergie_per_persoon (
+-- 2. Tables with one-level foreign keys
+CREATE TABLE persoon (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    persoon_id INT NOT NULL,
-    allergie_id INT NOT NULL,
-    ernst ENUM('laag', 'middel', 'hoog', 'levensgevaarlijk') DEFAULT 'middel',
-    opmerking TEXT,
-    datum_vastgesteld DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (persoon_id) REFERENCES persoon(id) ON DELETE CASCADE,
-    FOREIGN KEY (allergie_id) REFERENCES allergie(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_persoon_allergie (persoon_id, allergie_id)
-);
-
--- Role and user management tables
-CREATE TABLE rol (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    naam VARCHAR(100) NOT NULL UNIQUE,
-    beschrijving TEXT,
-    is_actief BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE gebruiker (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    persoon_id INT NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    email_verified_at TIMESTAMP NULL,
-    password VARCHAR(255) NOT NULL,
-    remember_token VARCHAR(100),
-    is_actief BOOLEAN DEFAULT TRUE,
-    last_login TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (persoon_id) REFERENCES persoon(id) ON DELETE CASCADE
-);
-
-CREATE TABLE rol_per_gebruiker (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    gebruiker_id INT NOT NULL,
-    rol_id INT NOT NULL,
-    toegekend_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    toegekend_door INT,
-    is_actief BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (gebruiker_id) REFERENCES gebruiker(id) ON DELETE CASCADE,
-    FOREIGN KEY (rol_id) REFERENCES rol(id) ON DELETE CASCADE,
-    FOREIGN KEY (toegekend_door) REFERENCES gebruiker(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_gebruiker_rol (gebruiker_id, rol_id)
-);
-
--- Contact management
-CREATE TABLE contact (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    type ENUM('telefoon', 'email', 'adres', 'website') NOT NULL,
-    waarde VARCHAR(255) NOT NULL,
-    label VARCHAR(100),
-    is_primair BOOLEAN DEFAULT FALSE,
-    is_actief BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE contact_per_gezin (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    gezin_id INT NOT NULL,
-    contact_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
-    FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_gezin_contact (gezin_id, contact_id)
-);
-
--- Food preferences
-CREATE TABLE eetwens (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    naam VARCHAR(255) NOT NULL UNIQUE,
-    beschrijving TEXT,
-    type ENUM('dieet', 'voorkeur', 'religie', 'medisch') DEFAULT 'voorkeur',
-    is_actief BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE eetwens_per_gezin (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    gezin_id INT NOT NULL,
-    eetwens_id INT NOT NULL,
-    opmerking TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
-    FOREIGN KEY (eetwens_id) REFERENCES eetwens(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_gezin_eetwens (gezin_id, eetwens_id)
-);
-
--- Product and inventory management
-CREATE TABLE categorie (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    naam VARCHAR(255) NOT NULL UNIQUE,
-    beschrijving TEXT,
-    parent_categorie_id INT,
-    is_actief BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (parent_categorie_id) REFERENCES categorie(id) ON DELETE SET NULL
-);
-
-CREATE TABLE leverancier (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    naam VARCHAR(255) NOT NULL,
-    bedrijfsnaam VARCHAR(255),
-    kvk_nummer VARCHAR(20),
-    btw_nummer VARCHAR(30),
-    adres VARCHAR(255),
-    postcode VARCHAR(10),
-    woonplaats VARCHAR(100),
+    gezin_id INT,
+    voornaam VARCHAR(100) NOT NULL,
+    achternaam VARCHAR(100) NOT NULL,
+    geboortedatum DATE,
+    geslacht ENUM('M', 'V', 'X') DEFAULT 'X',
     is_actief BOOLEAN DEFAULT TRUE,
     opmerking TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE contact_per_leverancier (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    leverancier_id INT NOT NULL,
-    contact_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (leverancier_id) REFERENCES leverancier(id) ON DELETE CASCADE,
-    FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_leverancier_contact (leverancier_id, contact_id)
-);
-
-CREATE TABLE magazijn (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    naam VARCHAR(255) NOT NULL,
-    locatie VARCHAR(255),
-    capaciteit INT,
-    temperatuur_min DECIMAL(5,2),
-    temperatuur_max DECIMAL(5,2),
-    is_actief BOOLEAN DEFAULT TRUE,
-    opmerking TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE
 );
 
 CREATE TABLE product (
@@ -284,6 +149,99 @@ CREATE TABLE product (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (categorie_id) REFERENCES categorie(id) ON DELETE RESTRICT
+);
+
+-- 3. Tables with two-level foreign keys
+CREATE TABLE gebruiker (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    persoon_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified_at TIMESTAMP NULL,
+    password VARCHAR(255) NOT NULL,
+    remember_token VARCHAR(100),
+    is_actief BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (persoon_id) REFERENCES persoon(id) ON DELETE CASCADE
+);
+
+CREATE TABLE allergie_per_persoon (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    persoon_id INT NOT NULL,
+    allergie_id INT NOT NULL,
+    ernst ENUM('laag', 'middel', 'hoog', 'levensgevaarlijk') DEFAULT 'middel',
+    opmerking TEXT,
+    datum_vastgesteld DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (persoon_id) REFERENCES persoon(id) ON DELETE CASCADE,
+    FOREIGN KEY (allergie_id) REFERENCES allergie(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_persoon_allergie (persoon_id, allergie_id)
+);
+
+CREATE TABLE voedselpakket (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gezin_id INT NOT NULL,
+    datum_uitgegeven DATE NOT NULL,
+    uitgegeven_door INT,
+    status ENUM('voorbereid', 'uitgegeven', 'geannuleerd') DEFAULT 'voorbereid',
+    totaal_gewicht DECIMAL(8,2),
+    opmerking TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
+    FOREIGN KEY (uitgegeven_door) REFERENCES gebruiker(id) ON DELETE SET NULL
+);
+
+-- 4. Junction tables
+CREATE TABLE rol_per_gebruiker (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gebruiker_id INT NOT NULL,
+    rol_id INT NOT NULL,
+    toegekend_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    toegekend_door INT,
+    is_actief BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (gebruiker_id) REFERENCES gebruiker(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES rol(id) ON DELETE CASCADE,
+    FOREIGN KEY (toegekend_door) REFERENCES gebruiker(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_gebruiker_rol (gebruiker_id, rol_id)
+);
+
+CREATE TABLE contact_per_gezin (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gezin_id INT NOT NULL,
+    contact_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_gezin_contact (gezin_id, contact_id)
+);
+
+CREATE TABLE contact_per_leverancier (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    leverancier_id INT NOT NULL,
+    contact_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (leverancier_id) REFERENCES leverancier(id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_leverancier_contact (leverancier_id, contact_id)
+);
+
+CREATE TABLE eetwens_per_gezin (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gezin_id INT NOT NULL,
+    eetwens_id INT NOT NULL,
+    opmerking TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
+    FOREIGN KEY (eetwens_id) REFERENCES eetwens(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_gezin_eetwens (gezin_id, eetwens_id)
 );
 
 CREATE TABLE product_per_leverancier (
@@ -318,21 +276,6 @@ CREATE TABLE product_per_magazijn (
     UNIQUE KEY unique_product_magazijn (product_id, magazijn_id)
 );
 
--- Food package management
-CREATE TABLE voedselpakket (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    gezin_id INT NOT NULL,
-    datum_uitgegeven DATE NOT NULL,
-    uitgegeven_door INT,
-    status ENUM('voorbereid', 'uitgegeven', 'geannuleerd') DEFAULT 'voorbereid',
-    totaal_gewicht DECIMAL(8,2),
-    opmerking TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (gezin_id) REFERENCES gezin(id) ON DELETE CASCADE,
-    FOREIGN KEY (uitgegeven_door) REFERENCES gebruiker(id) ON DELETE SET NULL
-);
-
 CREATE TABLE product_per_voedselpakket (
     id INT PRIMARY KEY AUTO_INCREMENT,
     voedselpakket_id INT NOT NULL,
@@ -348,6 +291,12 @@ CREATE TABLE product_per_voedselpakket (
     FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 );
 
+-- Add self-referencing foreign key for categorie
+ALTER TABLE categorie ADD FOREIGN KEY (parent_categorie_id) REFERENCES categorie(id) ON DELETE SET NULL;
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- Create indexes for better performance
 CREATE INDEX idx_persoon_gezin ON persoon(gezin_id);
 CREATE INDEX idx_allergie_per_persoon_persoon ON allergie_per_persoon(persoon_id);
@@ -361,7 +310,7 @@ CREATE INDEX idx_voedselpakket_datum ON voedselpakket(datum_uitgegeven);
 CREATE INDEX idx_product_categorie ON product(categorie_id);
 CREATE INDEX idx_product_ean ON product(ean_code);
 
--- Insert some basic data
+-- Insert basic data
 INSERT INTO allergie (naam, beschrijving, ernst_niveau) VALUES
 ('Noten', 'Alle soorten noten en notenprodukten', 'hoog'),
 ('Gluten', 'Glutenintolerantie en coeliakie', 'middel'),
