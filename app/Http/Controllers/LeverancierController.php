@@ -60,12 +60,12 @@ class LeverancierController extends Controller
             'leverancier_type' => 'required',
         ]);
         $leverancier->update($data);
-        return redirect()->route('leveranciers.show', $leverancier)->with('success', 'Leverancier bijgewerkt!');
+        return redirect()->route('leveranciers.index')->with('updated', 'Leverancier bijgewerkt!');
     }
 
     public function destroy(Leverancier $leverancier)
     {
         $leverancier->delete();
-        return redirect()->route('leveranciers.index')->with('success', 'Leverancier is verwijderd');
+        return redirect()->route('leveranciers.index')->with('deleted', 'Leverancier is verwijderd');
     }
 }
