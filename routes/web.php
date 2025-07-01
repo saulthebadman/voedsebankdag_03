@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AllergieController;
+use App\Http\Controllers\LeverancierController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,6 +29,20 @@ Route::middleware('auth')->group(function () {
     // API routes voor AJAX calls
     Route::get('/api/allergieen/statistieken', [AllergieController::class, 'apiStatistieken'])->name('api.allergieen.statistieken');
     Route::get('/api/allergieen/populair/{limiet?}', [AllergieController::class, 'getPopulaireAllergieen'])->name('api.allergieen.populair');
+    
+    // Leverancier routes - volledige module
+    Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
+    Route::get('/leveranciers/create', [LeverancierController::class, 'create'])->name('leveranciers.create');
+    Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
+    Route::get('/leveranciers/{leverancier}', [LeverancierController::class, 'show'])->name('leveranciers.show');
+    Route::delete('/leveranciers/{leverancier}', [LeverancierController::class, 'destroy'])->name('leveranciers.destroy');
+    Route::get('/leveranciers/{leverancier}/edit', [LeverancierController::class, 'edit'])->name('leveranciers.edit');
+    Route::put('/leveranciers/{leverancier}', [LeverancierController::class, 'update'])->name('leveranciers.update');
+
+    // Product routes
+    Route::get('/leveranciers/{leverancier}/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/leveranciers/{leverancier}/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::put('/leveranciers/{leverancier}/products/{product}/inline', [ProductController::class, 'inlineUpdate'])->name('products.inlineUpdate');
 });
 
 require __DIR__.'/auth.php';

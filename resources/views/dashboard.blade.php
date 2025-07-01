@@ -84,9 +84,9 @@
                         Onderhoud relaties met voedseldonateurs en suppliers.
                     </p>
                     <div class="space-y-2">
-                        <button class="btn-secondary-responsive w-full" disabled>
-                            🏢 Leveranciersoverzicht (Binnenkort)
-                        </button>
+                        <a href="{{ route('leveranciers.index') }}" class="btn-primary-responsive block text-center">
+                            🏢 Leveranciersoverzicht
+                        </a>
                     </div>
                 </div>
 

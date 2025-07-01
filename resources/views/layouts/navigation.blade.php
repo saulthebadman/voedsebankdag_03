@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('allergieen.index')" :active="request()->routeIs('allergieen.*')">
                         🚫 {{ __('Allergieën') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('leveranciers.index')" :active="request()->routeIs('leveranciers.*')">
+                        {{ __('Leveranciers') }}
+                    </x-nav-link>
                     
                     <!-- Dropdown for future modules -->
                     <div class="relative" x-data="{ open: false }">

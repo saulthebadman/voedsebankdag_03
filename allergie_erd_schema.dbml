@@ -1,0 +1,133 @@
+// Voedselbank Maaskantje - Allergie ERD
+// DBML Schema voor alle allergie-gerelateerde tabellen
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table allergies {
+  id integer [primary key, increment]
+  naam varchar [not null, unique, note: 'Naam van de allergie (bijv. Noten, Gluten)']
+  beschrijving text [note: 'Uitgebreide beschrijving van de allergie']
+  omschrijving text [note: 'Korte omschrijving van de allergie']
+  anafylactisch_risico varchar [default: 'laag', note: 'Risico op anafylactische reactie: geen, zeerlaag, laag, redelijk_hoog, hoog']
+  ernst_niveau varchar [default: 'middel', note: 'Ernst niveau: laag, middel, hoog']
+  is_actief boolean [default: true, note: 'Of de allergie actief is in het systeem']
+  opmerking varchar [note: 'Extra opmerkingen over de allergie']
+  datum_aangemaakt datetime [default: `CURRENT_TIMESTAMP`]
+  datum_gewijzigd datetime [default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table gezins {
+  id integer [primary key, increment]
+  naam varchar [not null, note: 'Naam van het gezin']
+  code varchar [unique, note: 'Unieke code voor het gezin']
+  adres varchar [note: 'Adres van het gezin']
+  postcode varchar [note: 'Postcode']
+  stad varchar [note: 'Stad']
+  land varchar [default: 'Nederland']
+  telefoon varchar [note: 'Telefoonnummer van het gezin']
+  email varchar [note: 'Email adres van het gezin']
+  aantal_volwassenen integer [default: 0, note: 'Aantal volwassenen in het gezin']
+  aantal_kinderen integer [default: 0, note: 'Aantal kinderen in het gezin']
+  totaal_personen integer [default: 0, note: 'Totaal aantal personen in het gezin']
+  inkomsten_per_maand decimal [note: 'Maandelijkse inkomsten van het gezin']
+  heeft_recht_op_pakket boolean [default: true, note: 'Of het gezin recht heeft op voedselpakket']
+  is_actief boolean [default: true, note: 'Of het gezin actief is']
+  opmerking varchar [note: 'Extra opmerkingen over het gezin']
+  datum_aangemaakt datetime [default: `CURRENT_TIMESTAMP`]
+  datum_gewijzigd datetime [default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table persoons {
+  id integer [primary key, increment]
+  gezin_id integer [ref: > gezins.id, note: 'Verwijzing naar het gezin waar de persoon bij hoort']
+  voornaam varchar [not null, note: 'Voornaam van de persoon']
+  tussenvoegsel varchar [note: 'Tussenvoegsel (van, de, etc.)']
+  achternaam varchar [not null, note: 'Achternaam van de persoon']
+  geboortedatum date [note: 'Geboortedatum van de persoon']
+  geslacht varchar [note: 'Geslacht van de persoon']
+  rol_in_gezin varchar [note: 'Rol binnen het gezin (hoofdpersoon, partner, kind, etc.)']
+  heeft_allergieen boolean [default: false, note: 'Of de persoon allergieën heeft']
+  medische_informatie text [note: 'Aanvullende medische informatie']
+  is_actief boolean [default: true, note: 'Of de persoon actief is in het systeem']
+  opmerking varchar [note: 'Extra opmerkingen over de persoon']
+  datum_aangemaakt datetime [default: `CURRENT_TIMESTAMP`]
+  datum_gewijzigd datetime [default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table allergie_per_persoons {
+  id integer [primary key, increment]
+  persoon_id integer [not null, ref: > persoons.id, note: 'Verwijzing naar de persoon']
+  allergie_id integer [not null, ref: > allergies.id, note: 'Verwijzing naar de allergie']
+  ernst varchar [default: 'middel', note: 'Ernst van de allergie voor deze persoon: laag, middel, hoog']
+  datum_vastgesteld date [note: 'Datum waarop de allergie is vastgesteld']
+  is_actief boolean [default: true, note: 'Of deze allergie-registratie actief is']
+  opmerking varchar [note: 'Specifieke opmerkingen over deze allergie voor deze persoon']
+  datum_aangemaakt datetime [default: `CURRENT_TIMESTAMP`]
+  datum_gewijzigd datetime [default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+  
+  indexes {
+    (persoon_id, allergie_id) [unique, name: 'unique_persoon_allergie']
+  }
+}
+
+Table products {
+  id integer [primary key, increment]
+  categorie_id integer [note: 'Verwijzing naar productcategorie']
+  naam varchar [not null, note: 'Naam van het product']
+  soort_allergie varchar [note: 'Allergie-informatie van het product']
+  barcode varchar [note: 'Barcode van het product']
+  houdbaarheidsdatum date [note: 'Houdbaarheidsdatum van het product']
+  omschrijving text [note: 'Beschrijving van het product']
+  status varchar [default: 'OpVoorraad', note: 'Status: OpVoorraad, NietOpVoorraad, NietLeverbaar, OverHoudbaarheidsDatum']
+  is_actief boolean [default: true, note: 'Of het product actief is']
+  opmerking varchar [note: 'Extra opmerkingen over het product']
+  datum_aangemaakt datetime [default: `CURRENT_TIMESTAMP`]
+  datum_gewijzigd datetime [default: `CURRENT_TIMESTAMP`]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+// Indexes voor betere performance
+Table indexes {
+  allergies_naam [note: 'Index op allergie naam voor sneller zoeken']
+  allergies_actief [note: 'Index op actieve allergieën']
+  allergie_per_persoons_persoon [note: 'Index op persoon_id voor snellere lookups']
+  allergie_per_persoons_allergie [note: 'Index op allergie_id voor snellere lookups']
+  persoons_gezin [note: 'Index op gezin_id voor snellere joins']
+  persoons_allergieen [note: 'Index op heeft_allergieen voor filtering']
+}
+
+// Database relaties
+Ref allergie_registratie: allergie_per_persoons.persoon_id > persoons.id [delete: cascade, note: 'Een persoon kan meerdere allergieën hebben']
+Ref allergie_definitie: allergie_per_persoons.allergie_id > allergies.id [delete: cascade, note: 'Een allergie kan bij meerdere personen voorkomen']
+Ref persoon_gezin: persoons.gezin_id > gezins.id [delete: set null, note: 'Meerdere personen kunnen bij één gezin horen']
+
+// Notities over het allergie-systeem
+Note: '''
+# Voedselbank Maaskantje - Allergie Management Systeem
+
+## Hoofdfunctionaliteiten:
+1. **Allergie Registratie**: Registratie van verschillende allergieën met risiconiveaus
+2. **Persoon-Allergie Koppeling**: Koppeling van specifieke allergieën aan personen
+3. **Gezin Management**: Beheer van gezinnen met allergie-informatie
+4. **Product Allergie-info**: Tracking van allergie-informatie per product
+
+## Belangrijke Business Rules:
+- Een persoon kan meerdere allergieën hebben
+- Een allergie kan voorkomen bij meerdere personen
+- Elke allergie-registratie heeft een ernst niveau (laag/middel/hoog)
+- Anafylactisch risico wordt bijgehouden voor veiligheid
+- Producten hebben allergie-informatie voor veilige distributie
+
+## Data Integriteit:
+- Unieke combinatie van persoon + allergie
+- Cascade delete voor allergie_per_persoons bij verwijdering persoon/allergie
+- Set null voor persoons bij verwijdering gezin (behoud data)
+'''
