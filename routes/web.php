@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AllergieController;
+use App\Http\Controllers\GezinAllergieDetailController;
+use App\Http\Controllers\PersoonAllergieController;
+use App\Http\Controllers\AllergieStatistiekController;
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -21,14 +24,13 @@ Route::middleware('auth')->group(function () {
     
     // Allergie routes - volledige module
     Route::get('/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
-    Route::get('/allergieen/filter', [AllergieController::class, 'filterByAllergie'])->name('allergieen.filter');
-    Route::get('/allergieen/gezin/{gezin}', [AllergieController::class, 'showGezinDetails'])->name('allergieen.gezin-details');
-    Route::get('/allergieen/persoon/{persoon}/allergie/{allergie}/edit', [AllergieController::class, 'editPersoonAllergie'])->name('allergieen.edit-persoon-allergie');
-    Route::put('/allergieen/persoon/{persoon}/allergie/{allergie}', [AllergieController::class, 'updatePersoonAllergie'])->name('allergieen.update-persoon-allergie');
+    Route::get('/allergieen/gezin/{gezin}', [GezinAllergieDetailController::class, 'showGezinDetails'])->name('allergieen.gezin-details');
+    Route::get('/allergieen/persoon/{persoon}/allergie/{allergie}/edit', [PersoonAllergieController::class, 'editPersoonAllergie'])->name('allergieen.edit-persoon-allergie');
+    Route::put('/allergieen/persoon/{persoon}/allergie/{allergie}', [PersoonAllergieController::class, 'updatePersoonAllergie'])->name('allergieen.update-persoon-allergie');
     
     // API routes voor AJAX calls
-    Route::get('/api/allergieen/statistieken', [AllergieController::class, 'apiStatistieken'])->name('api.allergieen.statistieken');
-    Route::get('/api/allergieen/populair/{limiet?}', [AllergieController::class, 'getPopulaireAllergieen'])->name('api.allergieen.populair');
+    Route::get('/api/allergieen/statistieken', [AllergieStatistiekController::class, 'apiStatistieken'])->name('api.allergieen.statistieken');
+    Route::get('/api/allergieen/populair/{limiet?}', [AllergieStatistiekController::class, 'getPopulaireAllergieen'])->name('api.allergieen.populair');
     
     // Leverancier routes - volledige module
     Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');

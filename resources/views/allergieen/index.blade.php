@@ -1,8 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="heading-responsive">
-            {{ __('Overzicht Gezinsallergieën') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 class="text-2xl font-bold text-green-600 border-b-2 border-green-600 pb-1">
+                Overzicht gezinnen met allergieën
+            </h2>
+            
+            <!-- Compacte filter rechts -->
+            <div class="flex items-center gap-3">
+                <form method="GET" action="{{ route('allergieen.index') }}" class="flex items-center gap-3" id="filterForm">
+                    <select name="allergie_id" id="allergie_id" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-48">
+                        <option value="">Selecteer Allergie</option>
+                        @foreach($allergieen as $allergie)
+                            <option value="{{ $allergie->id }}" {{ request('allergie_id') == $allergie->id ? 'selected' : '' }}>{{ $allergie->naam }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" id="filterBtn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                        Toon Gezinnen
+                    </button>
+                </form>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-6 sm:py-12">
@@ -10,41 +27,82 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-responsive text-gray-900">
                     
-                    <!-- Filter sectie -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                        <h3 class="subheading-responsive mb-4">Filter op allergie</h3>
-                        <form method="GET" action="{{ route('allergieen.filter') }}" class="form-responsive" id="filterForm">
-                            <div class="form-group-responsive">
-                                <label for="allergie_id" class="form-label-responsive">
-                                    Selecteer allergie: <span class="text-red-500">*</span>
-                                </label>
-                                <div class="w-full sm:w-3/4">
-                                    <select name="allergie_id" id="allergie_id" required class="form-input-responsive">
-                                        <option value="">-- Kies een allergie --</option>
-                                        @foreach($allergieen as $allergie)
-                                            <option value="{{ $allergie->id }}">{{ $allergie->naam }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('allergie_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="flex justify-start sm:justify-end mt-4">
-                                <button type="submit" id="filterBtn" disabled class="btn-secondary-responsive w-full sm:w-auto">
-                                    <span class="mobile-only">🔍</span>
-                                    <span class="desktop-only">Toon Gezinnen</span>
-                                    <span class="mobile-only ml-2">Zoeken</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
                     <!-- Overzicht van alle gezinnen met allergieën -->
                     <div>
-                        <h3 class="subheading-responsive mb-4">Alle gezinnen met voedselallergieën</h3>
+                        @if(request('allergie_id') && $geselecteerdeAllergie)
+                            <h3 class="subheading-responsive mb-4">Gezinnen met allergie "{{ $geselecteerdeAllergie->naam }}"</h3>
+                        @else
+                            <h3 class="subheading-responsive mb-4">Alle gezinnen met voedselallergieën</h3>
+                        @endif
                         
-                        @if($gezinnenMetAllergieen->isEmpty())
+                        @if($bericht)
+                            <!-- Desktop Table View met melding -->
+                            <div class="table-responsive desktop-only">
+                                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Naam</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Omschrijving</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Volwassenen</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Kinderen</th>
+                                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Baby's</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Vertegenwoordiger</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Allergie Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Gele melding rij -->
+                                        <tr>
+                                            <td colspan="7" class="px-6 py-8">
+                                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                                                    <div class="flex justify-center items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <p class="text-sm text-yellow-700 font-medium">
+                                                                {{ $bericht }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Reset filter knop in tabel -->
+                                                <div class="text-center mt-4">
+                                                    <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                                        Toon alle gezinnen
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Mobile melding -->
+                            <div class="mobile-only">
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                    <div class="flex justify-center items-center">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm text-yellow-700 font-medium">
+                                                {{ $bericht }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <a href="{{ route('allergieen.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                        Toon alle gezinnen
+                                    </a>
+                                </div>
+                            </div>
+                        @elseif($gezinnenMetAllergieen->isEmpty())
                             <div class="text-center py-8">
                                 <p class="text-gray-500 text-sm sm:text-base">Er zijn geen gezinnen met allergieën gevonden.</p>
                             </div>
@@ -191,44 +249,15 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const allergieSelect = document.getElementById('allergie_id');
-        const filterBtn = document.getElementById('filterBtn');
         const form = document.getElementById('filterForm');
+        const filterBtn = document.getElementById('filterBtn');
 
-        // Functie om filter button status te updaten
-        function updateFilterButton() {
-            if (allergieSelect.value) {
-                filterBtn.disabled = false;
-                filterBtn.classList.remove('btn-secondary-responsive');
-                filterBtn.classList.add('btn-primary-responsive');
-                filterBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                filterBtn.disabled = true;
-                filterBtn.classList.add('btn-secondary-responsive');
-                filterBtn.classList.remove('btn-primary-responsive');
-                filterBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        // Event listener voor select change
-        allergieSelect.addEventListener('change', updateFilterButton);
-
-        // Form validatie bij submit
+        // Form submit handler
         form.addEventListener('submit', function(e) {
-            if (!allergieSelect.value) {
-                e.preventDefault();
-                alert('Selecteer eerst een allergie om te filteren.');
-                allergieSelect.focus();
-                return false;
-            }
-
             // Disable button na submit om dubbele submits te voorkomen
             filterBtn.disabled = true;
             filterBtn.textContent = '⏳ Laden...';
         });
-
-        // Initial check
-        updateFilterButton();
     });
     </script>
 </x-app-layout>

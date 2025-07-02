@@ -112,7 +112,8 @@ class LeverancierController extends Controller
      */
     public function edit(Leverancier $leverancier): View
     {
-        return view('leveranciers.edit', compact('leverancier'));
+        $types = ['Bedrijf', 'Instelling', 'Overheid', 'Particulier', 'Donor'];
+        return view('leveranciers.edit', compact('leverancier', 'types'));
     }
 
     /**

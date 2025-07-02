@@ -728,22 +728,22 @@ INSERT INTO voedselpakkets (id, gezin_id, pakket_nummer, datum_samenstelling, da
 (5, 2, '5', '2024-04-13', '2024-04-14', 'Uitgereikt', 1, CURRENT_TIMESTAMP(6)),
 (6, 2, '6', '2024-04-20', NULL, 'NietUitgereikt', 1, CURRENT_TIMESTAMP(6));
 
--- Allergie per persoon (volgens specificatie)
+-- Allergie per persoon (volgens specificatie - ALLEEN SARAH MAG PINDA ALLERGIE HEBBEN)
 INSERT INTO allergie_per_persoons (id, persoon_id, allergie_id, ernst, is_actief, datum_aangemaakt) VALUES
 (1, 4, 1, 'middel', 1, CURRENT_TIMESTAMP(6)),  -- Johan van Zevenhuizen - Gluten
-(2, 5, 2, 'hoog', 1, CURRENT_TIMESTAMP(6)),    -- Sarah den Dolder - Pindas
+(2, 5, 2, 'hoog', 1, CURRENT_TIMESTAMP(6)),    -- Sarah den Dolder - Pindas (ENIGE MET PINDAS!)
 (3, 6, 3, 'hoog', 1, CURRENT_TIMESTAMP(6)),    -- Theo van Zevenhuizen - Schaaldieren
 (4, 7, 4, 'middel', 1, CURRENT_TIMESTAMP(6)),  -- Jantien van Zevenhuizen - Hazelnoten
 (5, 8, 3, 'hoog', 1, CURRENT_TIMESTAMP(6)),    -- Arjan Bergkamp - Schaaldieren
-(6, 9, 2, 'hoog', 1, CURRENT_TIMESTAMP(6)),    -- Janneke Sanders - Pindas
+(6, 9, 1, 'middel', 1, CURRENT_TIMESTAMP(6)),  -- Janneke Sanders - Gluten (WAS Pindas)
 (7, 10, 5, 'laag', 1, CURRENT_TIMESTAMP(6)),   -- Stein Bergkamp - Lactose
-(8, 12, 2, 'hoog', 1, CURRENT_TIMESTAMP(6)),   -- Mazin van Vliet - Pindas
+(8, 12, 3, 'hoog', 1, CURRENT_TIMESTAMP(6)),   -- Mazin van Vliet - Schaaldieren (WAS Pindas)
 (9, 13, 4, 'middel', 1, CURRENT_TIMESTAMP(6)), -- Selma van de Heuvel - Hazelnoten
 (10, 14, 1, 'hoog', 1, CURRENT_TIMESTAMP(6)),  -- Eva Scherder - Gluten
 (11, 15, 3, 'middel', 1, CURRENT_TIMESTAMP(6)), -- Felicia Scherder - Schaaldieren
 (12, 16, 5, 'laag', 1, CURRENT_TIMESTAMP(6)),  -- Devin Scherder - Lactose
-(13, 17, 1, 'hoog', 1, CURRENT_TIMESTAMP(6)),  -- Frieda de Jong - Gluten
-(14, 17, 2, 'hoog', 1, CURRENT_TIMESTAMP(6)),  -- Frieda de Jong - Pindas (dubbele allergie)
+(13, 17, 1, 'hoog', 1, CURRENT_TIMESTAMP(6)),  -- Frieda de Jong - Gluten (WAS Pindas)
+(14, 17, 4, 'middel', 1, CURRENT_TIMESTAMP(6)), -- Frieda de Jong - Hazelnoten (WAS tweede Pindas)
 (15, 18, 4, 'laag', 1, CURRENT_TIMESTAMP(6)),  -- Simeon de Jong - Hazelnoten
 (16, 19, 4, 'middel', 1, CURRENT_TIMESTAMP(6)); -- Hanna van der Berg - Hazelnoten
 

@@ -16,10 +16,10 @@
                         🏠 {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('allergieen.index')" :active="request()->routeIs('allergieen.*')">
-                        🚫 {{ __('Allergieën') }}
+                         {{ __('Overzicht gezinsallergieën') }}
                     </x-nav-link>
                     <x-nav-link :href="route('leveranciers.index')" :active="request()->routeIs('leveranciers.*')">
-                        {{ __('Leveranciers') }}
+                        {{ __('Overzicht Leveranciers') }}
                     </x-nav-link>
                     
                     <!-- Dropdown for future modules -->
